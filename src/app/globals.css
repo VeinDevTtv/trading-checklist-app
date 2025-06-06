@@ -67,3 +67,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Force include common utilities */
+@layer utilities {
+  .force-include {
+    @apply max-w-3xl mx-auto p-6 space-y-6 text-2xl font-bold;
+    @apply bg-primary text-primary-foreground border rounded-md;
+    @apply bg-secondary text-secondary-foreground;
+    @apply bg-background text-foreground;
+    @apply border-border bg-card text-card-foreground;
+  }
+}
