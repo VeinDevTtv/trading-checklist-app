@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# A+ Trade Checklist
+
+A comprehensive trading checklist application built with Next.js that helps traders make confident trading decisions using multiple strategies with a weighted scoring system.
+
+## Features
+
+- **Multiple Trading Strategies**: Pre-built strategies including ICT 2022 Entry, Regular Price Action, and Supply & Demand
+- **Custom Strategy Builder**: Create and edit your own trading strategies
+- **Weighted Scoring System**: Conditions are weighted by importance (High, Medium, Low)
+- **A+ Trade Verification**: Automatically determines if a setup qualifies as an A+ trade
+- **Trade History**: Keep track of all your analyzed trades
+- **PDF Export**: Export your checklist analysis as a PDF
+- **Responsive Design**: Works on desktop and mobile devices
 
 ## Getting Started
 
-First, run the development server:
+### Development
+
+First, install the dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Building for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To build the application for production:
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+To export as static files (for GitHub Pages):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run export
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment to GitHub Pages
 
-## Deploy on Vercel
+This application is configured for automatic deployment to GitHub Pages using GitHub Actions.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Setup Instructions
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Enable GitHub Pages** in your repository settings:
+   - Go to Settings → Pages
+   - Set Source to "GitHub Actions"
+
+2. **Push to main branch**: The deployment will trigger automatically when you push to the main branch.
+
+3. **Access your site**: After deployment, your site will be available at:
+   ```
+   https://[your-username].github.io/[repository-name]/
+   ```
+
+### Manual Deployment
+
+If you prefer to deploy manually:
+
+1. Build the static export:
+   ```bash
+   npm run export
+   ```
+
+2. The static files will be generated in the `out/` directory
+
+3. Deploy the contents of the `out/` directory to your hosting provider
+
+## How to Use
+
+1. **Select a Strategy**: Choose from pre-built strategies or create your own
+2. **Check Conditions**: Go through each condition and check those that are met
+3. **Add Notes**: Include any additional observations or notes
+4. **Review Score**: The app calculates a weighted score and determines if it's an A+ trade
+5. **Save Trade**: Log the trade for future reference
+6. **Export PDF**: Generate a PDF report of your analysis
+
+## Technologies Used
+
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type safety and better development experience
+- **Tailwind CSS** - Utility-first CSS framework
+- **Shadcn/ui** - Beautiful and accessible UI components
+- **jsPDF** - PDF generation for trade reports
+- **Radix UI** - Headless UI components for accessibility
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
