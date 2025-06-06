@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Trash2 } from "lucide-react";
 import jsPDF from "jspdf";
 
 // -------------------- Types --------------------
@@ -117,7 +118,7 @@ export default function TradingChecklistApp() {
     setOpenEdit(true);
   };
 
-  // utility: scoring
+  // utility: improved scoring
   const possibleScore = activeStrategy.conditions.reduce(
     (sum, c) => sum + importanceWeights[c.importance],
     0
@@ -127,7 +128,26 @@ export default function TradingChecklistApp() {
     return cond ? sum + importanceWeights[cond.importance] : sum;
   }, 0);
 
-  const verdict = score >= possibleScore * 0.9 ? "A+" : "Not A+";
+  // Improved A+ calculation
+  const getVerdict = () => {
+    const highConditions = activeStrategy.conditions.filter(c => c.importance === "high");
+    const checkedHighConditions = checkedIds.filter(id => {
+      const cond = activeStrategy.conditions.find(c => c.id === id);
+      return cond?.importance === "high";
+    });
+    
+    // If all high importance conditions are checked, it's A+
+    if (highConditions.length > 0 && checkedHighConditions.length === highConditions.length) {
+      return "A+";
+    }
+    
+    // Otherwise, use the 85% threshold (lowered from 90%)
+    const percentage = possibleScore > 0 ? (score / possibleScore) : 0;
+    return percentage >= 0.85 ? "A+" : "Not A+";
+  };
+
+  const verdict = getVerdict();
+  const percentage = possibleScore > 0 ? Math.round((score / possibleScore) * 100) : 0;
 
   // save trade
   const saveTrade = () => {
@@ -151,7 +171,7 @@ export default function TradingChecklistApp() {
   const exportPdf = () => {
     const doc = new jsPDF();
     doc.text(`Strategy: ${activeStrategy.name}`, 10, 10);
-    doc.text(`Score: ${score}/${possibleScore} (${verdict})`, 10, 20);
+    doc.text(`Score: ${score}/${possibleScore} (${percentage}%) - ${verdict}`, 10, 20);
     activeStrategy.conditions.forEach((c, idx) => {
       const mark = checkedIds.includes(c.id) ? "[x]" : "[ ]";
       doc.text(`${mark} ${c.text} (${c.importance})`, 10, 30 + idx * 10);
@@ -170,6 +190,10 @@ export default function TradingChecklistApp() {
         importance: "medium",
       },
     ]);
+  };
+
+  const removeBuilderCondition = (index: number) => {
+    setBuilderConds(builderConds.filter((_, i) => i !== index));
   };
 
   const saveNewStrategy = () => {
@@ -193,6 +217,9 @@ export default function TradingChecklistApp() {
     );
     setStrategies(updated);
     setOpenEdit(false);
+    // Clear checked conditions that no longer exist
+    const newConditionIds = builderConds.map(c => c.id);
+    setCheckedIds(prev => prev.filter(id => newConditionIds.includes(id)));
   };
 
   return (
@@ -245,11 +272,16 @@ export default function TradingChecklistApp() {
           />
 
           <div className="flex items-center justify-between">
-            <span
-              className={verdict === "A+" ? "text-green-600" : "text-yellow-600"}
-            >
-              Verdict: {verdict === "A+" ? "✅ Confident Entry. This is an A+ trade setup." : "⚠️ Not A+. Wait for more confluences before entering."}
-            </span>
+            <div className="flex flex-col">
+              <span
+                className={verdict === "A+" ? "text-green-600" : "text-yellow-600"}
+              >
+                Verdict: {verdict === "A+" ? "✅ Confident Entry. This is an A+ trade setup." : "⚠️ Not A+. Wait for more confluences before entering."}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                Score: {score}/{possibleScore} ({percentage}%)
+              </span>
+            </div>
             <div className="space-x-2">
               <Button onClick={saveTrade}>Save Trade</Button>
               <Button variant="outline" onClick={exportPdf}>Export PDF</Button>
@@ -318,6 +350,14 @@ export default function TradingChecklistApp() {
                     <SelectItem value="low">🟨 Low</SelectItem>
                   </SelectContent>
                 </Select>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeBuilderCondition(idx)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             ))}
             <Button variant="secondary" onClick={addBuilderCondition}>+ Add Condition</Button>
@@ -370,6 +410,14 @@ export default function TradingChecklistApp() {
                     <SelectItem value="low">🟨 Low</SelectItem>
                   </SelectContent>
                 </Select>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeBuilderCondition(idx)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             ))}
             <Button variant="secondary" onClick={addBuilderCondition}>+ Add Condition</Button>
@@ -390,7 +438,7 @@ export default function TradingChecklistApp() {
 --------------------------------------------------------------------
 👉  CLI COMPONENTS TO ADD (shadcn)
 --------------------------------------------------------------------
-Run these once if you haven’t already:
+Run these once if you haven't already:
 
 npx shadcn@latest add button
 npx shadcn@latest add checkbox
