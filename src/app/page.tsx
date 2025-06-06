@@ -5,11 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ModeToggle } from "@/components/mode-toggle";
+import { RiskCalculator } from "@/components/risk-calculator";
+import { Settings } from "@/components/settings";
+import { 
+  Trash2, 
+  CheckCircle, 
+  AlertTriangle, 
+  TrendingUp, 
+  History, 
+  Calculator,
+  Settings as SettingsIcon,
+  Plus,
+  Edit,
+  Download,
+  Star
+} from "lucide-react";
 import jsPDF from "jspdf";
 
 // -------------------- Types --------------------
@@ -188,8 +206,11 @@ export default function TradingChecklistApp() {
   // Don't render until data is loaded to prevent hydration issues
   if (!isLoaded) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="text-center">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading your trading data...</p>
+        </div>
       </div>
     );
   }
@@ -197,8 +218,11 @@ export default function TradingChecklistApp() {
   const activeStrategy = strategies.find((s) => s.id === activeId) || strategies[0];
   if (!activeStrategy) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="text-center text-red-600">No strategies available</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-red-600">
+          <AlertTriangle className="h-12 w-12 mx-auto mb-4" />
+          <p>No strategies available</p>
+        </div>
       </div>
     );
   }
@@ -336,214 +360,368 @@ export default function TradingChecklistApp() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">A+ Trade Checklist</h1>
-
-      {/* Strategy Selector */}
-      <div className="flex items-center space-x-4 flex-wrap">
-        <Select value={activeId} onValueChange={(v) => setActiveId(v)}>
-          <SelectTrigger className="w-64">
-            <SelectValue placeholder="Select strategy" />
-          </SelectTrigger>
-          <SelectContent>
-            {strategies.map((s) => (
-              <SelectItem key={s.id} value={s.id}>
-                {s.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button onClick={() => setOpenNew(true)}>+ New Strategy</Button>
-        <Button variant="outline" onClick={startEdit}>Edit Strategy</Button>
-        <Button variant="destructive" size="sm" onClick={clearAllData}>Clear All Data</Button>
-      </div>
-
-      {/* Checklist Card */}
-      <Card>
-        <CardContent className="p-4 space-y-4">
-          {activeStrategy.conditions.map((c) => (
-            <div key={c.id} className="flex items-center space-x-2">
-              <Checkbox checked={checkedIds.includes(c.id)} onCheckedChange={() => toggleCheck(c.id)} />
-              <span>
-                {c.text} {" "}
-                <span className={
-                  c.importance === "high"
-                    ? "text-red-600"
-                    : c.importance === "medium"
-                    ? "text-orange-500"
-                    : "text-yellow-500"
-                }>
-                  ({c.importance})
-                </span>
-              </span>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Star className="h-8 w-8 text-primary" />
+                <h1 className="text-2xl font-bold">A+ Trade Checklist</h1>
+              </div>
             </div>
-          ))}
-
-          <Textarea
-            placeholder="Notes..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <span
-                className={verdict === "A+" ? "text-green-600" : "text-yellow-600"}
-              >
-                Verdict: {verdict === "A+" ? "✅ Confident Entry. This is an A+ trade setup." : "⚠️ Not A+. Wait for more confluences before entering."}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                Score: {score}/{possibleScore} ({percentage}%)
-              </span>
-            </div>
-            <div className="space-x-2">
-              <Button onClick={saveTrade}>Save Trade</Button>
-              <Button variant="outline" onClick={exportPdf}>Export PDF</Button>
+            <div className="flex items-center space-x-4">
+              <ModeToggle />
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </header>
 
-      {/* Trade History */}
-      <div>
-        <h2 className="text-lg font-semibold mb-2">Trade History</h2>
-        {history.length === 0 && (
-          <p className="text-sm text-muted-foreground">No trades logged yet.</p>
-        )}
-        {history.map((t) => (
-          <Card key={t.id} className="mb-2">
-            <CardContent className="p-3 space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span>{t.strategyName}</span>
-                <span>{t.timestamp}</span>
-              </div>
-              <p>Score: {t.score}/{t.possible} — {t.verdict}</p>
-              <p className="italic">{t.notes}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs defaultValue="checklist" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="checklist" className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" />
+              Checklist
+            </TabsTrigger>
+            <TabsTrigger value="calculator" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Risk Calculator
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Trade History
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <SettingsIcon className="h-4 w-4" />
+              Settings
+            </TabsTrigger>
+          </TabsList>
 
-      {/* ---------- New Strategy Dialog ---------- */}
-      <Dialog open={openNew} onOpenChange={setOpenNew}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>New Strategy</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 max-h-[70vh] overflow-y-auto">
-            <Label>Name</Label>
-            <Input value={newName} onChange={(e) => setNewName(e.target.value)} />
+          {/* Checklist Tab */}
+          <TabsContent value="checklist" className="space-y-6">
+            {/* Strategy Selector */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Strategy Selection
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-4 flex-wrap gap-4">
+                  <Select value={activeId} onValueChange={(v) => setActiveId(v)}>
+                    <SelectTrigger className="w-64">
+                      <SelectValue placeholder="Select strategy" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {strategies.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={() => setOpenNew(true)} className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    New Strategy
+                  </Button>
+                  <Button variant="outline" onClick={startEdit} className="flex items-center gap-2">
+                    <Edit className="h-4 w-4" />
+                    Edit Strategy
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={clearAllData}>
+                    Clear All Data
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-            <Label>Conditions</Label>
-            {builderConds.map((c, idx) => (
-              <div key={c.id} className="flex space-x-2 items-center">
-                <Input
-                  className="flex-1"
-                  value={c.text}
-                  onChange={(e) => {
-                    const copy = [...builderConds];
-                    copy[idx].text = e.target.value;
-                    setBuilderConds(copy);
-                  }}
-                  placeholder="Condition text..."
+            {/* Checklist Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    {activeStrategy.name}
+                  </span>
+                  <Badge variant={verdict === "A+" ? "default" : "secondary"} className="text-sm">
+                    {verdict === "A+" ? "✅ A+ Setup" : "⚠️ Not A+"}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  {activeStrategy.conditions.map((c) => (
+                    <div key={c.id} className="flex items-center space-x-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                      <Checkbox 
+                        checked={checkedIds.includes(c.id)} 
+                        onCheckedChange={() => toggleCheck(c.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">{c.text}</span>
+                        <Badge 
+                          variant="outline" 
+                          className={`ml-2 text-xs ${
+                            c.importance === "high"
+                              ? "border-red-500 text-red-600"
+                              : c.importance === "medium"
+                              ? "border-orange-500 text-orange-600"
+                              : "border-yellow-500 text-yellow-600"
+                          }`}
+                        >
+                          {c.importance}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <Label htmlFor="notes">Trade Notes</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="Add your trade analysis, market conditions, or any other relevant notes..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className={`text-lg font-semibold ${verdict === "A+" ? "text-green-600" : "text-yellow-600"}`}>
+                      {verdict === "A+" ? "✅ Confident Entry" : "⚠️ Wait for More Confluences"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Score: {score}/{possibleScore} ({percentage}%)
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button onClick={saveTrade} className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      Save Trade
+                    </Button>
+                    <Button variant="outline" onClick={exportPdf} className="flex items-center gap-2">
+                      <Download className="h-4 w-4" />
+                      Export PDF
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Risk Calculator Tab */}
+          <TabsContent value="calculator">
+            <RiskCalculator />
+          </TabsContent>
+
+          {/* Trade History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Trade History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {history.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No trades logged yet.</p>
+                    <p className="text-sm">Start by completing a checklist and saving your first trade!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {history.map((t) => (
+                      <Card key={t.id} className="border-l-4 border-l-primary">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline">{t.strategyName}</Badge>
+                              <Badge variant={t.verdict === "A+" ? "default" : "secondary"}>
+                                {t.verdict}
+                              </Badge>
+                            </div>
+                            <span className="text-sm text-muted-foreground">{t.timestamp}</span>
+                          </div>
+                          <div className="text-sm space-y-1">
+                            <p><strong>Score:</strong> {t.score}/{t.possible} ({Math.round((t.score/t.possible)*100)}%)</p>
+                                                         {t.notes && <p className="italic text-muted-foreground">&ldquo;{t.notes}&rdquo;</p>}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings">
+            <Settings />
+          </TabsContent>
+        </Tabs>
+
+        {/* Strategy Builder Dialogs */}
+        <Dialog open={openNew} onOpenChange={setOpenNew}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Create New Strategy</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="strategy-name">Strategy Name</Label>
+                <Input 
+                  id="strategy-name"
+                  value={newName} 
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Enter strategy name..."
                 />
-                <Select
-                  value={c.importance}
-                  onValueChange={(v) => {
-                    const copy = [...builderConds];
-                    copy[idx].importance = v as Importance;
-                    setBuilderConds(copy);
-                  }}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high">🟥 High</SelectItem>
-                    <SelectItem value="medium">🟧 Medium</SelectItem>
-                    <SelectItem value="low">🟨 Low</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeBuilderCondition(idx)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
+              </div>
+
+              <div className="space-y-4">
+                <Label>Conditions</Label>
+                {builderConds.map((c, idx) => (
+                  <div key={c.id} className="flex space-x-2 items-center p-3 border rounded-lg">
+                    <Input
+                      className="flex-1"
+                      value={c.text}
+                      onChange={(e) => {
+                        const copy = [...builderConds];
+                        copy[idx].text = e.target.value;
+                        setBuilderConds(copy);
+                      }}
+                      placeholder="Condition description..."
+                    />
+                    <Select
+                      value={c.importance}
+                      onValueChange={(v) => {
+                        const copy = [...builderConds];
+                        copy[idx].importance = v as Importance;
+                        setBuilderConds(copy);
+                      }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">🔴 High</SelectItem>
+                        <SelectItem value="medium">🟡 Medium</SelectItem>
+                        <SelectItem value="low">🟢 Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeBuilderCondition(idx)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" onClick={addBuilderCondition} className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Condition
                 </Button>
               </div>
-            ))}
-            <Button variant="secondary" onClick={addBuilderCondition}>+ Add Condition</Button>
-            <div className="flex justify-end space-x-2 pt-4">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={saveNewStrategy}>Save</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
-      {/* ---------- Edit Strategy Dialog ---------- */}
-      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Edit Strategy</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 max-h-[70vh] overflow-y-auto">
-            <Label>Name</Label>
-            <Input value={newName} onChange={(e) => setNewName(e.target.value)} />
-
-            <Label>Conditions</Label>
-            {builderConds.map((c, idx) => (
-              <div key={c.id} className="flex space-x-2 items-center">
-                <Input
-                  className="flex-1"
-                  value={c.text}
-                  onChange={(e) => {
-                    const copy = [...builderConds];
-                    copy[idx].text = e.target.value;
-                    setBuilderConds(copy);
-                  }}
-                />
-                <Select
-                  value={c.importance}
-                  onValueChange={(v) => {
-                    const copy = [...builderConds];
-                    copy[idx].importance = v as Importance;
-                    setBuilderConds(copy);
-                  }}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high">🟥 High</SelectItem>
-                    <SelectItem value="medium">🟧 Medium</SelectItem>
-                    <SelectItem value="low">🟨 Low</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeBuilderCondition(idx)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
+              <div className="flex justify-end space-x-2 pt-4">
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={saveNewStrategy} disabled={!newName || builderConds.length === 0}>
+                  Create Strategy
                 </Button>
               </div>
-            ))}
-            <Button variant="secondary" onClick={addBuilderCondition}>+ Add Condition</Button>
-            <div className="flex justify-end space-x-2 pt-4">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={saveEditedStrategy}>Save</Button>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Strategy</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="edit-strategy-name">Strategy Name</Label>
+                <Input 
+                  id="edit-strategy-name"
+                  value={newName} 
+                  onChange={(e) => setNewName(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <Label>Conditions</Label>
+                {builderConds.map((c, idx) => (
+                  <div key={c.id} className="flex space-x-2 items-center p-3 border rounded-lg">
+                    <Input
+                      className="flex-1"
+                      value={c.text}
+                      onChange={(e) => {
+                        const copy = [...builderConds];
+                        copy[idx].text = e.target.value;
+                        setBuilderConds(copy);
+                      }}
+                    />
+                    <Select
+                      value={c.importance}
+                      onValueChange={(v) => {
+                        const copy = [...builderConds];
+                        copy[idx].importance = v as Importance;
+                        setBuilderConds(copy);
+                      }}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">🔴 High</SelectItem>
+                        <SelectItem value="medium">🟡 Medium</SelectItem>
+                        <SelectItem value="low">🟢 Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeBuilderCondition(idx)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" onClick={addBuilderCondition} className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Condition
+                </Button>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={saveEditedStrategy}>
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </main>
     </div>
   );
 }
