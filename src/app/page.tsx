@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -81,23 +81,46 @@ const defaultStrategies: Strategy[] = [
   },
 ];
 
+// -------------------- LocalStorage Utilities --------------------
+
+const STORAGE_KEYS = {
+  STRATEGIES: 'trading-checklist-strategies',
+  HISTORY: 'trading-checklist-history',
+  ACTIVE_STRATEGY: 'trading-checklist-active-strategy',
+  CHECKED_IDS: 'trading-checklist-checked-ids',
+  NOTES: 'trading-checklist-notes',
+};
+
+const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
+  if (typeof window === 'undefined') return defaultValue;
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (error) {
+    console.warn(`Failed to load ${key} from localStorage:`, error);
+    return defaultValue;
+  }
+};
+
+const saveToStorage = <T,>(key: string, value: T): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn(`Failed to save ${key} to localStorage:`, error);
+  }
+};
+
 // -------------------- Component --------------------
 
 export default function TradingChecklistApp() {
   // strategies state
   const [strategies, setStrategies] = useState<Strategy[]>(defaultStrategies);
-  const [activeId, setActiveId] = useState<string>(strategies[0].id);
-  const activeStrategy = strategies.find((s) => s.id === activeId)!;
+  const [activeId, setActiveId] = useState<string>("");
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // checklist state
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
-  const toggleCheck = (id: number) => {
-    setCheckedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
-  // notes
   const [notes, setNotes] = useState<string>("");
 
   // history
@@ -110,6 +133,81 @@ export default function TradingChecklistApp() {
   // new strategy builder state
   const [newName, setNewName] = useState("");
   const [builderConds, setBuilderConds] = useState<Condition[]>([]);
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const loadedStrategies = loadFromStorage(STORAGE_KEYS.STRATEGIES, defaultStrategies);
+    const loadedHistory = loadFromStorage(STORAGE_KEYS.HISTORY, []);
+    const loadedActiveId = loadFromStorage(STORAGE_KEYS.ACTIVE_STRATEGY, loadedStrategies[0]?.id || "");
+    const loadedCheckedIds = loadFromStorage(STORAGE_KEYS.CHECKED_IDS, []);
+    const loadedNotes = loadFromStorage(STORAGE_KEYS.NOTES, "");
+
+    setStrategies(loadedStrategies);
+    setHistory(loadedHistory);
+    setActiveId(loadedActiveId);
+    setCheckedIds(loadedCheckedIds);
+    setNotes(loadedNotes);
+    setIsLoaded(true);
+  }, []);
+
+  // Save strategies to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStorage(STORAGE_KEYS.STRATEGIES, strategies);
+    }
+  }, [strategies, isLoaded]);
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStorage(STORAGE_KEYS.HISTORY, history);
+    }
+  }, [history, isLoaded]);
+
+  // Save active strategy to localStorage whenever it changes
+  useEffect(() => {
+    if (isLoaded && activeId) {
+      saveToStorage(STORAGE_KEYS.ACTIVE_STRATEGY, activeId);
+    }
+  }, [activeId, isLoaded]);
+
+  // Save checked conditions to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStorage(STORAGE_KEYS.CHECKED_IDS, checkedIds);
+    }
+  }, [checkedIds, isLoaded]);
+
+  // Save notes to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStorage(STORAGE_KEYS.NOTES, notes);
+    }
+  }, [notes, isLoaded]);
+
+  // Don't render until data is loaded to prevent hydration issues
+  if (!isLoaded) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
+
+  const activeStrategy = strategies.find((s) => s.id === activeId) || strategies[0];
+  if (!activeStrategy) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="text-center text-red-600">No strategies available</div>
+      </div>
+    );
+  }
+
+  const toggleCheck = (id: number) => {
+    setCheckedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
 
   // edit builder clones existing
   const startEdit = () => {
@@ -222,12 +320,27 @@ export default function TradingChecklistApp() {
     setCheckedIds(prev => prev.filter(id => newConditionIds.includes(id)));
   };
 
+  // Clear all data function (for debugging/reset purposes)
+  const clearAllData = () => {
+    if (confirm("Are you sure you want to clear all saved data? This cannot be undone.")) {
+      Object.values(STORAGE_KEYS).forEach(key => {
+        localStorage.removeItem(key);
+      });
+      // Reset to defaults
+      setStrategies(defaultStrategies);
+      setActiveId(defaultStrategies[0].id);
+      setCheckedIds([]);
+      setNotes("");
+      setHistory([]);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold">A+ Trade Checklist</h1>
 
       {/* Strategy Selector */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 flex-wrap">
         <Select value={activeId} onValueChange={(v) => setActiveId(v)}>
           <SelectTrigger className="w-64">
             <SelectValue placeholder="Select strategy" />
@@ -242,6 +355,7 @@ export default function TradingChecklistApp() {
         </Select>
         <Button onClick={() => setOpenNew(true)}>+ New Strategy</Button>
         <Button variant="outline" onClick={startEdit}>Edit Strategy</Button>
+        <Button variant="destructive" size="sm" onClick={clearAllData}>Clear All Data</Button>
       </div>
 
       {/* Checklist Card */}
