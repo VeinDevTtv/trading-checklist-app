@@ -29,6 +29,7 @@ import {
   CheckCircle, 
   AlertTriangle, 
   TrendingUp, 
+  TrendingDown,
   History, 
   Calculator,
   Settings as SettingsIcon,
@@ -170,6 +171,7 @@ export default function TradingChecklistApp() {
   const [openEdit, setOpenEdit] = useState(false);
   const [openHistory, setOpenHistory] = useState(false);
   const [openSharing, setOpenSharing] = useState(false);
+  const [openTradeEdit, setOpenTradeEdit] = useState(false);
 
   // images
   const [tradeImages, setTradeImages] = useState<TradeImage[]>([]);
@@ -178,11 +180,25 @@ export default function TradingChecklistApp() {
   const [newName, setNewName] = useState("");
   const [builderConds, setBuilderConds] = useState<Condition[]>([]);
 
+  // trade editing state
+  const [editingTrade, setEditingTrade] = useState<TradeLog | null>(null);
+  const [editTradeForm, setEditTradeForm] = useState({
+    pnl: "",
+    riskAmount: "",
+    outcome: "" as 'win' | 'loss' | 'breakeven' | "",
+    riskRewardRatio: "",
+    pair: "",
+    session: "" as 'london' | 'new-york' | 'tokyo' | 'sydney' | "",
+    setup: "",
+    tags: [] as string[]
+  });
+
   // onboarding state
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
   // filtering state
   const [showFilters, setShowFilters] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [tradeFilters, setTradeFilters] = useState<TradeFiltersType>({
     search: '',
     strategy: '',
@@ -198,9 +214,6 @@ export default function TradingChecklistApp() {
     pnlMax: '',
   });
   const [availableTags, setAvailableTags] = useState<TradeTag[]>([]);
-
-  // calendar state
-  const [showCalendar, setShowCalendar] = useState(false);
 
   // Filtered trades
   const filteredTrades = useTradeFilters(history as EnhancedTradeLog[], tradeFilters);
@@ -487,9 +500,57 @@ export default function TradingChecklistApp() {
   const handleCreateTag = (tag: Omit<TradeTag, 'id'>) => {
     const newTag: TradeTag = {
       ...tag,
-      id: `custom-${Date.now()}`
+      id: Date.now().toString()
     };
     setAvailableTags(prev => [...prev, newTag]);
+  };
+
+  const startTradeEdit = (trade: TradeLog) => {
+    setEditingTrade(trade);
+    setEditTradeForm({
+      pnl: trade.pnl?.toString() || "",
+      riskAmount: trade.riskAmount?.toString() || "",
+      outcome: trade.outcome || "",
+      riskRewardRatio: trade.riskRewardRatio?.toString() || "",
+      pair: trade.pair || "",
+      session: trade.session || "",
+      setup: trade.setup || "",
+      tags: trade.tags || []
+    });
+    setOpenTradeEdit(true);
+  };
+
+  const saveTradeEdit = () => {
+    if (!editingTrade) return;
+
+    const updatedTrade: TradeLog = {
+      ...editingTrade,
+      pnl: editTradeForm.pnl ? parseFloat(editTradeForm.pnl) : undefined,
+      riskAmount: editTradeForm.riskAmount ? parseFloat(editTradeForm.riskAmount) : undefined,
+      outcome: editTradeForm.outcome || undefined,
+      riskRewardRatio: editTradeForm.riskRewardRatio ? parseFloat(editTradeForm.riskRewardRatio) : undefined,
+      pair: editTradeForm.pair || undefined,
+      session: editTradeForm.session || undefined,
+      setup: editTradeForm.setup || undefined,
+      tags: editTradeForm.tags
+    };
+
+    const updatedHistory = history.map(trade => 
+      trade.id === editingTrade.id ? updatedTrade : trade
+    );
+
+    setHistory(updatedHistory);
+    saveToStorage(STORAGE_KEYS.HISTORY, updatedHistory);
+    setOpenTradeEdit(false);
+    setEditingTrade(null);
+  };
+
+  const deleteTrade = (tradeId: number) => {
+    if (window.confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
+      const updatedHistory = history.filter(trade => trade.id !== tradeId);
+      setHistory(updatedHistory);
+      saveToStorage(STORAGE_KEYS.HISTORY, updatedHistory);
+    }
   };
 
   return (
@@ -669,7 +730,7 @@ export default function TradingChecklistApp() {
                       Score: {score}/{possibleScore} ({percentage}%)
                     </div>
                   </div>
-                  <div className="flex space-x-2">
+                                    <div className="flex space-x-2">
                     <Button onClick={saveTrade} className="flex items-center gap-2" data-tour="save-trade">
                       <CheckCircle className="h-4 w-4" />
                       Save Trade
@@ -680,6 +741,22 @@ export default function TradingChecklistApp() {
                     </Button>
                   </div>
                 </div>
+                
+                {history.length > 0 && (
+                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                          Don&apos;t forget to update your trades!
+                        </p>
+                        <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                          After closing your trades, go to the Trade History tab to add P&L, outcomes, and other details for performance tracking.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -774,8 +851,34 @@ export default function TradingChecklistApp() {
                               </Badge>
                               {t.pair && <Badge variant="outline">{t.pair}</Badge>}
                               {t.session && <Badge variant="outline">{t.session}</Badge>}
+                              {t.outcome && (
+                                <Badge variant={
+                                  t.outcome === 'win' ? 'default' : 
+                                  t.outcome === 'loss' ? 'destructive' : 'secondary'
+                                }>
+                                  {t.outcome}
+                                </Badge>
+                              )}
                             </div>
-                            <span className="text-sm text-muted-foreground">{t.timestamp}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground">{t.timestamp}</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => startTradeEdit(t)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => deleteTrade(t.id)}
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                           <div className="text-sm space-y-1">
                             <p><strong>Score:</strong> {t.score}/{t.possible} ({Math.round((t.score/t.possible)*100)}%)</p>
@@ -783,6 +886,20 @@ export default function TradingChecklistApp() {
                               <p><strong>P&L:</strong> <span className={t.pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
                                 ${t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(2)}
                               </span></p>
+                            )}
+                            {t.riskRewardRatio && (
+                              <p><strong>Risk:Reward:</strong> 1:{t.riskRewardRatio.toFixed(2)}</p>
+                            )}
+                            {t.setup && <p><strong>Setup:</strong> {t.setup}</p>}
+                            {t.tags && t.tags.length > 0 && (
+                              <div className="flex items-center gap-1 mt-2">
+                                <strong>Tags:</strong>
+                                {t.tags.map((tag, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
                             )}
                             {t.notes && <p className="italic text-muted-foreground">&ldquo;{t.notes}&rdquo;</p>}
                           </div>
@@ -984,6 +1101,171 @@ export default function TradingChecklistApp() {
           isFirstVisit={isFirstVisit}
           onTourComplete={handleTourComplete}
         />
+
+                 {/* Trade Edit Dialog */}
+         <Dialog open={openTradeEdit} onOpenChange={setOpenTradeEdit}>
+           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+             <DialogHeader>
+               <DialogTitle className="flex items-center gap-2">
+                 <Edit className="h-5 w-5" />
+                 Update Trade Results
+               </DialogTitle>
+               <p className="text-sm text-muted-foreground">
+                 Add post-trade information to track performance and analytics
+               </p>
+             </DialogHeader>
+             <div className="space-y-6">
+               {editingTrade && (
+                 <Card className="bg-muted/50">
+                   <CardContent className="p-4">
+                     <div className="flex items-center gap-2 mb-2">
+                       <Badge variant="outline">{editingTrade.strategyName}</Badge>
+                       <Badge variant={editingTrade.verdict === "A+" ? "default" : "secondary"}>
+                         {editingTrade.verdict}
+                       </Badge>
+                     </div>
+                     <p className="text-sm text-muted-foreground">
+                       Score: {editingTrade.score}/{editingTrade.possible} ({Math.round((editingTrade.score/editingTrade.possible)*100)}%) • {editingTrade.timestamp}
+                     </p>
+                   </CardContent>
+                 </Card>
+               )}
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-pnl">P&L ($)</Label>
+                   <Input
+                     id="edit-pnl"
+                     type="number"
+                     step="0.01"
+                     placeholder="Enter profit/loss amount"
+                     value={editTradeForm.pnl}
+                     onChange={(e) => setEditTradeForm({ ...editTradeForm, pnl: e.target.value })}
+                   />
+                 </div>
+
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-outcome">Outcome</Label>
+                   <Select
+                     value={editTradeForm.outcome}
+                     onValueChange={(v) => setEditTradeForm({ ...editTradeForm, outcome: v as 'win' | 'loss' | 'breakeven' | "" })}
+                   >
+                     <SelectTrigger>
+                       <SelectValue placeholder="Select outcome" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="win">
+                         <div className="flex items-center gap-2">
+                           <TrendingUp className="h-4 w-4 text-green-600" />
+                           Win
+                         </div>
+                       </SelectItem>
+                       <SelectItem value="loss">
+                         <div className="flex items-center gap-2">
+                           <TrendingDown className="h-4 w-4 text-red-600" />
+                           Loss
+                         </div>
+                       </SelectItem>
+                       <SelectItem value="breakeven">
+                         <div className="flex items-center gap-2">
+                           <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                           Breakeven
+                         </div>
+                       </SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-risk-amount">Risk Amount ($)</Label>
+                   <Input
+                     id="edit-risk-amount"
+                     type="number"
+                     step="0.01"
+                     placeholder="Amount risked on trade"
+                     value={editTradeForm.riskAmount}
+                     onChange={(e) => setEditTradeForm({ ...editTradeForm, riskAmount: e.target.value })}
+                   />
+                 </div>
+
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-rr-ratio">Risk:Reward Ratio</Label>
+                   <Input
+                     id="edit-rr-ratio"
+                     type="number"
+                     step="0.1"
+                     placeholder="e.g., 2.5 for 1:2.5"
+                     value={editTradeForm.riskRewardRatio}
+                     onChange={(e) => setEditTradeForm({ ...editTradeForm, riskRewardRatio: e.target.value })}
+                   />
+                 </div>
+
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-pair">Currency Pair</Label>
+                   <Input
+                     id="edit-pair"
+                     placeholder="e.g., EUR/USD"
+                     value={editTradeForm.pair}
+                     onChange={(e) => setEditTradeForm({ ...editTradeForm, pair: e.target.value })}
+                   />
+                 </div>
+
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-session">Trading Session</Label>
+                   <Select
+                     value={editTradeForm.session}
+                     onValueChange={(v) => setEditTradeForm({ ...editTradeForm, session: v as 'london' | 'new-york' | 'tokyo' | 'sydney' | "" })}
+                   >
+                     <SelectTrigger>
+                       <SelectValue placeholder="Select session" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="london">London Session</SelectItem>
+                       <SelectItem value="new-york">New York Session</SelectItem>
+                       <SelectItem value="tokyo">Tokyo Session</SelectItem>
+                       <SelectItem value="sydney">Sydney Session</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+               </div>
+
+               <div className="space-y-2">
+                 <Label htmlFor="edit-setup">Setup Type</Label>
+                 <Input
+                   id="edit-setup"
+                   placeholder="e.g., Breakout, Pullback, Reversal"
+                   value={editTradeForm.setup}
+                   onChange={(e) => setEditTradeForm({ ...editTradeForm, setup: e.target.value })}
+                 />
+               </div>
+
+               <div className="space-y-2">
+                 <Label htmlFor="edit-tags">Tags (comma-separated)</Label>
+                 <Input
+                   id="edit-tags"
+                   placeholder="e.g., scalp, swing, news-trade"
+                   value={editTradeForm.tags.join(', ')}
+                   onChange={(e) => setEditTradeForm({ 
+                     ...editTradeForm, 
+                     tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean)
+                   })}
+                 />
+               </div>
+
+               <Separator />
+
+               <div className="flex justify-end space-x-2">
+                 <DialogClose asChild>
+                   <Button variant="outline">Cancel</Button>
+                 </DialogClose>
+                 <Button onClick={saveTradeEdit} className="flex items-center gap-2">
+                   <CheckCircle className="h-4 w-4" />
+                   Update Trade
+                 </Button>
+               </div>
+             </div>
+           </DialogContent>
+         </Dialog>
       </main>
     </div>
   );

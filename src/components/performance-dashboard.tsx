@@ -145,14 +145,23 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
   }
 
   if (!metrics || tradeResults.length === 0) {
+    const tradesWithoutPnL = trades.filter(t => t.pnl === undefined).length;
+    
     return (
       <Card>
         <CardContent className="flex items-center justify-center h-64">
           <div className="text-center space-y-4">
             <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground" />
             <div>
-              <p className="text-lg font-semibold">No Trading Data</p>
-              <p className="text-muted-foreground">Start logging trades with P&L data to see performance analytics</p>
+              <p className="text-lg font-semibold">
+                {trades.length === 0 ? 'No Trading Data' : 'Missing Trade Results'}
+              </p>
+              <p className="text-muted-foreground">
+                {trades.length === 0 
+                  ? 'Start logging trades with P&L data to see performance analytics'
+                  : `You have ${tradesWithoutPnL} trade${tradesWithoutPnL !== 1 ? 's' : ''} without P&L data. Edit your trades in the Trade History tab to add outcomes and P&L for performance tracking.`
+                }
+              </p>
             </div>
           </div>
         </CardContent>
