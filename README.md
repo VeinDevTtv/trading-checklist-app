@@ -1,6 +1,6 @@
-# A+ Trade Checklist
+# 🚀 A+ Trading Checklist - Professional Trading Analysis Platform
 
-A comprehensive, professional-grade trading checklist application designed to help traders make confident, data-driven trading decisions. Built with Next.js 15, TypeScript, and modern web technologies, featuring multiple trading strategies, intelligent scoring systems, advanced analytics, risk management tools, and persistent data storage.
+A comprehensive, professional-grade trading checklist application designed to help traders make confident, data-driven trading decisions. Built with Next.js 15, TypeScript, and cutting-edge web technologies, featuring advanced collaboration, multimedia note-taking, intelligent analytics, and real-time performance tracking.
 
 ## 🌟 Live Demo
 
@@ -8,256 +8,284 @@ A comprehensive, professional-grade trading checklist application designed to he
 
 ## 📋 Table of Contents
 
-- [Features](#-features)
-- [Trading Strategies](#-trading-strategies)
-- [Scoring System](#-scoring-system)
-- [Technology Stack](#-technology-stack)
-- [Installation](#-installation)
-- [Usage Guide](#-usage-guide)
-- [Data Persistence](#-data-persistence)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
+- [🎯 Core Features](#-core-features)
+- [🎙️ Voice & Video Notes](#️-voice--video-notes)
+- [🔥 Tag-Based Heat-Maps](#-tag-based-heat-maps)
+- [🤝 Real-Time Collaboration](#-real-time-collaboration)
+- [📊 Advanced Analytics](#-advanced-analytics)
+- [🗓️ Calendar Heat-Map](#️-calendar-heat-map)
+- [🧮 Risk Management](#-risk-management)
+- [🎯 Trading Strategies](#-trading-strategies)
+- [📊 Scoring System](#-scoring-system)
+- [🛠 Technology Stack](#-technology-stack)
+- [🚀 Installation](#-installation)
+- [📖 Usage Guide](#-usage-guide)
+- [🌐 Deployment](#-deployment)
+- [🤝 Contributing](#-contributing)
 
-## ✨ Features
+## 🎯 Core Features
 
-### 🎯 Core Trading Features
+### 📋 Intelligent Trading Checklist
+- **Multiple Pre-Built Strategies**: ICT 2022, Price Action, Supply & Demand with expert-crafted conditions
+- **Custom Strategy Builder**: Create unlimited custom strategies with drag-drop condition management
+- **Smart A+ Scoring**: Advanced weighted scoring algorithm considering condition importance
+- **Real-Time Feedback**: Instant confidence level updates as you check conditions
+- **Strategy Versioning**: Complete revision history with one-click restore capability
+- **PDF Export**: Professional trade analysis reports with jsPDF integration
 
-- **Multiple Trading Strategies**: Pre-built strategies for ICT 2022, Price Action, and Supply & Demand
-- **Custom Strategy Builder**: Create and edit your own trading strategies with unlimited conditions
-- **Intelligent A+ Scoring**: Advanced scoring algorithm that considers condition importance with weighted calculations
-- **Trade History Tracking**: Complete log of all your trading decisions with timestamps and detailed metadata
-- **PDF Export**: Export your checklist analysis as professional PDF reports with jsPDF integration
-- **Real-time Scoring**: Live calculation of trade confidence levels with instant feedback
-- **Image Attachments**: Add up to 3 screenshots and charts to your trade analysis with drag-drop support and IndexedDB storage
-- **Voice & Video Notes**: Record 30-second audio/video snippets with automatic transcription via Web Speech API
-- **Strategy Versioning**: Full revision history with restore capability for all strategy modifications
-- **Strategy Sharing**: Export/import strategies via JSON files or shareable URLs with metadata
+### 📈 Complete Trade Management
+- **Comprehensive Trade History**: Full audit trail with timestamps, metadata, and performance tracking
+- **Image Attachments**: Add up to 3 screenshots per trade with drag-drop support and IndexedDB storage
+- **Advanced Filtering**: Multi-dimensional filtering by strategy, outcome, date, P&L, tags, and more
+- **Full-Text Search**: Search through all trade notes and analysis instantly
+- **Data Export/Import**: JSON-based backup and restore with cross-device synchronization
+- **Offline Functionality**: Complete offline capability with local data persistence
 
-### 📊 Advanced Analytics & Performance Dashboard
+## 🎙️ Voice & Video Notes
 
-- **Comprehensive Performance Metrics**: 
-  - Win Rate, Profit Factor, Sharpe Ratio
-  - Maximum Drawdown, Average Win/Loss
-  - Risk-Adjusted Returns, Calmar Ratio
-  - Total Trades, Winning/Losing Streaks
-- **Interactive Equity Curve**: Real-time visualization of account growth with Recharts
-- **Strategy Performance Comparison**: Side-by-side analysis of different trading strategies
-- **Risk-Reward Distribution Analysis**: Visual breakdown of R:R ratios across all trades
-- **Outcome Distribution Charts**: Pie charts showing win/loss/breakeven percentages
-- **Monthly Performance Summaries**: Detailed monthly breakdowns with key statistics
-- **Tag-Based Heat-Maps**: Click any tag ("London session", "XAUUSD") to see win-rate & equity curve filtered to that tag
-- **Web Worker Integration**: Heavy calculations run in background for smooth UI performance
-- **Performance Caching**: Intelligent caching system for faster dashboard loading
+### 🎤 Audio Recording Capabilities
+- **30-Second Voice Notes**: Quick audio memos for trade analysis and market observations
+- **Real-Time Transcription**: Automatic speech-to-text using Web Speech API
+- **Playback Controls**: Play, pause, and scrub through recordings with visual waveform
+- **Download & Share**: Export audio files for external use or sharing with mentors
+- **Searchable Transcripts**: All transcribed text is searchable across your trade history
 
-### 🗓️ Calendar Heat-map & Time Analysis
+### 📹 Video Recording Features
+- **Screen + Camera Recording**: Capture both your screen and webcam simultaneously
+- **Chart Analysis Videos**: Record your chart analysis with voice-over explanation
+- **Visual Trade Reviews**: Create video summaries of your trading decisions
+- **Instant Playback**: Review recordings immediately after capture
+- **Storage Integration**: Videos stored locally with efficient compression
 
-- **Interactive Trading Calendar**: Monthly view with color-coded performance indicators
-- **Daily Performance Heat-map**: Visual representation of profitable vs unprofitable days
-- **A+ Setup Tracking**: Highlight days with high-quality setups vs execution days
-- **Session-based Analysis**: Performance breakdown by London, New York, Tokyo, Sydney sessions
-- **Day-of-Week Analytics**: Identify your most/least profitable trading days
-- **Monthly Statistics**: Trading days, average trades per day, monthly P&L summaries
-- **Tooltip Details**: Hover over any day to see detailed trade information
+### 🔍 Advanced Transcription
+- **Multi-Language Support**: Transcription works with multiple languages
+- **Punctuation & Formatting**: Intelligent text formatting with proper punctuation
+- **Confidence Scoring**: Visual indicators showing transcription accuracy
+- **Manual Editing**: Edit transcripts for accuracy and clarity
+- **Fallback Support**: Graceful degradation for browsers without speech recognition
 
-### 🏷️ Enhanced Organization & Advanced Filtering
+## 🔥 Tag-Based Heat-Maps
 
-- **Multi-dimensional Filtering System**:
-  - Strategy name, verdict (A+ vs non-A+), outcome (win/loss/breakeven)
-  - Currency pairs, trading sessions, day of week
-  - Date ranges with calendar picker
-  - P&L ranges (min/max profit/loss)
-  - Full-text search through trade notes
-- **Smart Tagging System**: 
-  - Pre-built tags for sessions, currency pairs, setups
-  - Custom tag creation with color coding
-  - Tag categories: session, pair, setup, outcome, custom
-- **Advanced Search**: Full-text search through all trade notes and analysis
-- **Filter Persistence**: All filter settings saved across browser sessions
-- **Quick Filter Toggles**: One-click access to common filter combinations
+### 🏷️ Intelligent Tagging System
+- **Multi-Category Tags**: Session tags (London, New York, Tokyo, Sydney), currency pairs (EUR/USD, GBP/USD), setups (Breakout, Pullback, Reversal), and custom tags
+- **Color-Coded Organization**: Visual tag categories with customizable colors
+- **Auto-Tagging**: Automatic tag suggestions based on trade data
+- **Tag Hierarchies**: Organize tags in logical groups and categories
+- **Bulk Tag Management**: Apply tags to multiple trades simultaneously
 
-### 🚀 User Experience & Onboarding
+### 📊 Interactive Performance Heat-Maps
+- **Click-to-Filter Analytics**: Click any tag to instantly see filtered performance metrics
+- **Win-Rate Visualization**: Color-coded tiles showing performance intensity by tag
+- **Equity Curve Filtering**: See equity curves filtered to specific tags or combinations
+- **Performance Comparison**: Side-by-side comparison of different tag performance
+- **Statistical Breakdown**: Detailed stats including total P&L, average P&L, best/worst trades
 
-- **Interactive Guided Tour**: Comprehensive walkthrough using @reactour/tour with step-by-step guidance
-- **Responsive Design**: Fully optimized for desktop, tablet, and mobile devices
-- **Dark/Light Theme**: System preference detection with manual toggle using next-themes
-- **Keyboard Shortcuts**: Quick access to common actions
-- **Auto-save Functionality**: Automatic saving of all progress and settings
-- **Loading States**: Smooth loading indicators for all async operations
-- **Error Handling**: Graceful error handling with user-friendly messages
-- **Accessibility**: WCAG compliant with proper ARIA labels and keyboard navigation
+### 🎯 Advanced Tag Analytics
+- **Tag Performance Ranking**: Sort tags by win rate, total P&L, or trade count
+- **Correlation Analysis**: Identify which tag combinations perform best together
+- **Time-Based Tag Performance**: See how tag performance changes over time
+- **Risk-Adjusted Tag Metrics**: Sharpe ratio and risk metrics for each tag
+- **Tag-Based Alerts**: Get notified when certain tag combinations show declining performance
 
-### 🧮 Advanced Risk Management Calculator
+## 🤝 Real-Time Collaboration
 
-- **Position Size Calculator**: Precise lot size calculations based on account balance and risk percentage
-- **Dynamic Risk Assessment**: Real-time risk level indicators:
-  - Conservative (≤1%), Moderate (≤2%), Aggressive (≤5%), Very High Risk (>5%)
-- **Risk:Reward Analysis**: Automatic calculation and rating of risk-reward ratios:
-  - Excellent (≥3:1), Good (≥2:1), Fair (≥1:1), Poor (<1:1)
-- **Multi-currency Support**: Pip value calculations for different currency pairs
-- **Visual Risk Indicators**: Color-coded risk levels and R:R ratings
-- **Real-time Calculations**: Instant updates as you modify trade parameters
-- **Educational Content**: Built-in risk management tips and best practices
-
-### 🤝 Real-Time Collaboration Rooms
-
-- **Live Collaboration**: Work with mentors and other traders in real-time using Yjs + WebRTC technology
-- **Synchronized Checklists**: See checklist updates, notes, and cursor movements instantly across all connected users
-- **Inline Comments System**: Leave feedback and questions with threaded comments on specific conditions
-- **User Presence Indicators**: See who's online with color-coded user avatars and activity status
-- **Cursor Tracking**: Real-time cursor positions show where other users are focusing
-- **Room Management**: Create private rooms or join existing ones with simple room IDs
-- **Comment Resolution**: Mark comments as resolved to keep discussions organized
+### 👥 Live Collaboration Rooms
 - **Peer-to-Peer Connection**: Direct WebRTC connections for low-latency, secure collaboration
+- **Room Management**: Create private rooms or join existing ones with simple room IDs
+- **User Presence**: See who's online with color-coded avatars and activity indicators
 - **No Server Required**: Fully decentralized collaboration without external dependencies
+- **Cross-Platform**: Works seamlessly across desktop, tablet, and mobile devices
 
-### ⚙️ Application Settings & Customization
+### 🔄 Synchronized Trading Analysis
+- **Live Checklist Updates**: See checklist changes in real-time across all connected users
+- **Cursor Tracking**: Real-time cursor positions show where other users are focusing
+- **Synchronized Notes**: Trade notes and analysis sync instantly between collaborators
+- **Shared Strategy Building**: Collaborate on creating and refining trading strategies
+- **Version Conflict Resolution**: Intelligent conflict resolution for simultaneous edits
 
-- **Comprehensive Settings Panel**:
-  - Auto-save toggle, compact mode, notification preferences
-  - Default risk percentages and account balance
-  - Theme preferences and display options
-- **Data Management**:
-  - Export/import settings as JSON files
-  - Backup and restore functionality
-  - Clear all data option with confirmation
-- **Performance Optimization**:
-  - Lazy loading of components
-  - Efficient re-rendering with React optimizations
-  - Memory management for large datasets
+### 💬 Inline Comments System
+- **Contextual Comments**: Leave feedback and questions on specific checklist conditions
+- **Threaded Discussions**: Organized comment threads for complex discussions
+- **Comment Resolution**: Mark comments as resolved to keep discussions organized
+- **Mentor Feedback**: Perfect for mentor-student relationships and trade review sessions
+- **Comment History**: Complete audit trail of all feedback and discussions
 
-### 💾 Advanced Data Management & Storage
+### 🎓 Educational Collaboration Features
+- **Mentor Mode**: Special interface for mentors to guide students through analysis
+- **Screen Sharing**: Share your screen during live collaboration sessions
+- **Voice Chat Integration**: Built-in voice communication during collaboration
+- **Session Recording**: Record collaboration sessions for later review
+- **Progress Tracking**: Mentors can track student progress over time
 
-- **Multi-layer Storage Architecture**:
-  - **LocalStorage**: Settings, strategies, and trade metadata
-  - **IndexedDB**: Image storage and large datasets via Dexie
-  - **Web Workers**: Background processing for performance calculations
-- **Data Integrity**: Automatic data validation and error recovery
-- **Cross-session Continuity**: Resume exactly where you left off
-- **Storage Optimization**: Efficient data compression and cleanup
-- **Backup Systems**: Multiple backup and restore options
+## 📊 Advanced Analytics
 
-### 🌐 Chrome Extension Integration
+### 📈 Comprehensive Performance Dashboard
+- **Key Performance Indicators**: Win rate, profit factor, Sharpe ratio, maximum drawdown, Calmar ratio
+- **Interactive Equity Curve**: Real-time visualization of account growth with zoom and pan
+- **Strategy Performance Comparison**: Side-by-side analysis of different trading strategies
+- **Risk-Reward Distribution**: Visual breakdown of R:R ratios across all trades
+- **Monthly Performance Summaries**: Detailed monthly breakdowns with key statistics
+- **Web Worker Integration**: Heavy calculations run in background for smooth UI performance
 
-- **TradingView Overlay**: Floating checklist directly on TradingView charts
-- **Auto Currency Pair Detection**: Automatically detects trading pairs from TradingView
-- **Real-time Synchronization**: Seamless sync with the main web application
-- **Draggable Interface**: Move the overlay anywhere on screen for optimal workflow
-- **Quick Trade Saving**: Save trades directly from TradingView without switching tabs
-- **Extension Popup**: Quick access to strategies and recent trades
-- **Background Processing**: Service worker for efficient data synchronization
+### 🎯 Advanced Performance Metrics
+- **Winning/Losing Streaks**: Identify patterns in consecutive wins and losses
+- **Drawdown Analysis**: Understand and visualize losing periods
+- **Risk-Adjusted Returns**: Sophisticated risk metrics for professional analysis
+- **Session Performance**: Performance breakdown by trading sessions and time zones
+- **Setup Analysis**: Most and least profitable trade setups
+- **Outcome Distribution**: Pie charts showing win/loss/breakeven percentages
+
+### 🔍 Deep Analytics Features
+- **Performance Attribution**: Understand what drives your trading performance
+- **Correlation Analysis**: Identify relationships between different performance factors
+- **Volatility Analysis**: Track performance consistency over time
+- **Benchmark Comparison**: Compare your performance against market benchmarks
+- **Performance Forecasting**: Predictive analytics based on historical performance
+- **Custom Metrics**: Create your own performance indicators and tracking metrics
+
+## 🗓️ Calendar Heat-Map
+
+### 📅 Interactive Trading Calendar
+- **Monthly Performance View**: Color-coded calendar showing daily trading performance
+- **Daily Performance Heat-Map**: Visual representation of profitable vs unprofitable days
+- **A+ Setup Tracking**: Highlight days with high-quality setups vs execution days
+- **Session-Based Analysis**: Performance breakdown by London, New York, Tokyo, Sydney sessions
+- **Day-of-Week Analytics**: Identify your most and least profitable trading days
+- **Tooltip Details**: Hover over any day to see detailed trade information and statistics
+
+### 📊 Calendar Analytics
+- **Trading Frequency Analysis**: Track how often you trade and identify patterns
+- **Performance Consistency**: Visualize consistency in your trading performance
+- **Seasonal Patterns**: Identify seasonal trends in your trading performance
+- **Holiday Impact**: See how holidays and market events affect your trading
+- **Monthly Comparisons**: Compare performance across different months and years
+- **Goal Tracking**: Set and track monthly trading goals and targets
+
+## 🧮 Risk Management
+
+### 💰 Advanced Position Size Calculator
+- **Dynamic Risk Assessment**: Real-time risk level indicators (Conservative ≤1%, Moderate ≤2%, Aggressive ≤5%, Very High Risk >5%)
+- **Multi-Currency Support**: Pip value calculations for different currency pairs and account currencies
+- **Risk:Reward Analysis**: Automatic calculation and rating of risk-reward ratios (Excellent ≥3:1, Good ≥2:1, Fair ≥1:1, Poor <1:1)
+- **Visual Risk Indicators**: Color-coded risk levels and R:R ratings with educational tooltips
+- **Portfolio Risk**: Calculate total portfolio risk across multiple open positions
+- **Risk Budgeting**: Set and track daily, weekly, and monthly risk budgets
+
+### 📊 Risk Analytics
+- **Risk Distribution**: Visualize how risk is distributed across different trades and strategies
+- **Risk-Adjusted Performance**: Calculate and track risk-adjusted returns
+- **Value at Risk (VaR)**: Statistical risk measurement for portfolio management
+- **Stress Testing**: Simulate performance under different market conditions
+- **Risk Correlation**: Understand how different trades and strategies correlate
+- **Risk Reporting**: Generate comprehensive risk reports for analysis
 
 ## 🎯 Trading Strategies
 
-### Pre-Built Strategies
+### 📋 Pre-Built Professional Strategies
 
-#### 1. ICT 2022 Entry Strategy
-Advanced Inner Circle Trader methodology focusing on:
-- **SMT confirmed** (High Importance) - Smart Money Tool confirmation
-- **BOS after FVG** (High Importance) - Break of Structure after Fair Value Gap
-- **Killzone timing** (Medium Importance) - Optimal entry timing windows
-- **Clean OB mitigation** (Medium Importance) - Order Block mitigation analysis
-- **RR ≥ 1:3** (Low Importance) - Risk-reward ratio minimum threshold
+#### 🎯 ICT 2022 Entry Strategy
+Advanced Inner Circle Trader methodology focusing on institutional order flow:
+- **SMT Confirmed** (🔴 High) - Smart Money Tool divergence confirmation
+- **BOS After FVG** (🔴 High) - Break of Structure after Fair Value Gap
+- **Killzone Timing** (🟡 Medium) - Optimal entry timing windows (London/NY open)
+- **Clean OB Mitigation** (🟡 Medium) - Order Block mitigation analysis
+- **RR ≥ 1:3** (🟢 Low) - Risk-reward ratio minimum threshold
 
-#### 2. Regular Price Action Strategy
-Classic technical analysis approach featuring:
-- **Break / Retest confirmed** (High Importance) - Support/resistance break and retest
-- **Clear trend direction** (Medium Importance) - Trend alignment confirmation
-- **Support/Resistance respected** (Medium Importance) - Key level validation
-- **No upcoming red‑folder news** (Low Importance) - High-impact news avoidance
+#### 📊 Regular Price Action Strategy
+Classic technical analysis approach with modern refinements:
+- **Break/Retest Confirmed** (🔴 High) - Support/resistance break and retest validation
+- **Clear Trend Direction** (🟡 Medium) - Multi-timeframe trend alignment
+- **Support/Resistance Respected** (🟡 Medium) - Key level validation and confluence
+- **No Upcoming Red-Folder News** (🟢 Low) - High-impact news event avoidance
 
-#### 3. Supply & Demand Strategy
-Institutional order flow analysis including:
-- **Fresh S/D zone** (High Importance) - Untested supply/demand zones
-- **Liquidity sweep into zone** (High Importance) - Stop hunt confirmation
-- **Lower‑TF BOS out of zone** (Medium Importance) - Lower timeframe confirmation
-- **Confluence with HTF imbalance** (Low Importance) - Higher timeframe alignment
+#### 🏢 Supply & Demand Strategy
+Institutional order flow analysis with advanced zone identification:
+- **Fresh S/D Zone** (🔴 High) - Untested supply/demand zones with strong reaction history
+- **Liquidity Sweep Into Zone** (🔴 High) - Stop hunt confirmation before reversal
+- **Lower-TF BOS Out of Zone** (🟡 Medium) - Lower timeframe break of structure confirmation
+- **Confluence with HTF Imbalance** (🟢 Low) - Higher timeframe imbalance alignment
 
-### Custom Strategy Builder
-
-- **Unlimited Conditions**: Add as many conditions as needed for your strategy
-- **Importance Levels**: Assign High (🔴), Medium (🟡), or Low (🟢) importance with visual indicators
-- **Strategy Templates**: Save and reuse strategy templates
-- **Condition Reordering**: Drag and drop to reorder conditions
-- **Bulk Operations**: Edit multiple conditions simultaneously
-- **Strategy Validation**: Automatic validation of strategy completeness
+### 🛠️ Custom Strategy Builder
+- **Unlimited Conditions**: Add as many conditions as needed for your unique approach
+- **Importance Weighting**: Assign High (🔴), Medium (🟡), or Low (🟢) importance with visual indicators
+- **Drag & Drop Reordering**: Organize conditions in logical order
+- **Condition Templates**: Save and reuse common condition patterns
+- **Strategy Validation**: Automatic validation ensures strategy completeness
+- **Bulk Operations**: Edit multiple conditions simultaneously for efficiency
 
 ## 📊 Scoring System
 
-### Intelligent A+ Algorithm
+### 🧠 Intelligent A+ Algorithm
 
 The application uses a sophisticated scoring system that considers both the number of conditions met and their relative importance:
 
-#### Importance Weights
-- **High Importance**: 3 points (Critical conditions that must be met)
-- **Medium Importance**: 2 points (Important but not critical conditions)
-- **Low Importance**: 1 point (Nice-to-have confirmations)
+#### ⚖️ Importance Weights
+- **🔴 High Importance**: 3 points (Critical conditions that must be met)
+- **🟡 Medium Importance**: 2 points (Important but not critical conditions)
+- **🟢 Low Importance**: 1 point (Nice-to-have confirmations)
 
-#### A+ Qualification Rules
+#### ✅ A+ Qualification Rules
 1. **Automatic A+**: If ALL high-importance conditions are checked (ensures critical criteria are met)
 2. **Percentage-Based A+**: If 85% or more of total possible points are achieved
 3. **Weighted Calculation**: Score = (Σ checked_condition_weights) / (Σ total_possible_weights) × 100
 
-#### Visual Feedback System
+#### 🎨 Visual Feedback System
 - **Real-time Updates**: Score recalculates instantly as conditions are checked/unchecked
 - **Color-coded Indicators**: Green for A+ setups, yellow/orange for non-A+ setups
-- **Confidence Levels**: 
-  - "✅ Confident Entry" for A+ setups
-  - "⚠️ Wait for More Confluences" for non-A+ setups
+- **Confidence Levels**: "✅ Confident Entry" for A+ setups, "⚠️ Wait for More Confluences" for non-A+ setups
 - **Progress Visualization**: Visual progress bar showing completion percentage
 
 ## 🛠 Technology Stack
 
-### Frontend Framework & Core
-- **Next.js 15.3.3**: Latest React framework with App Router and Turbopack
-- **React 19**: Latest React with concurrent features and improved performance
-- **TypeScript 5**: Full type safety and enhanced developer experience
+### 🚀 Frontend Framework & Core
+- **Next.js 15.3.3**: Latest React framework with App Router, Turbopack, and Server Components
+- **React 19**: Latest React with concurrent features, automatic batching, and improved performance
+- **TypeScript 5**: Full type safety, enhanced developer experience, and strict mode enabled
 
-### Styling & UI Components
-- **Tailwind CSS 3.4.17**: Utility-first CSS framework with custom configuration
-- **shadcn/ui**: High-quality, accessible component library built on Radix UI
-- **Radix UI**: Unstyled, accessible UI primitives for complex components
-- **Lucide React**: Beautiful, customizable icon library
+### 🎨 Styling & UI Components
+- **Tailwind CSS 3.4.17**: Utility-first CSS framework with custom configuration and design system
+- **shadcn/ui**: High-quality, accessible component library built on Radix UI primitives
+- **Radix UI**: Unstyled, accessible UI primitives for complex components and interactions
+- **Lucide React**: Beautiful, customizable icon library with consistent design language
 - **Class Variance Authority**: Dynamic styling utilities for component variants
-- **Tailwind Merge**: Intelligent Tailwind class merging
+- **Tailwind Merge**: Intelligent Tailwind class merging for optimal performance
 
-### Data Visualization & Charts
-- **Recharts 2.15.3**: Advanced charting library for performance analytics
-- **Interactive Charts**: Line charts, area charts, bar charts, pie charts
-- **Responsive Visualizations**: Charts adapt to different screen sizes
+### 📊 Data Visualization & Charts
+- **Recharts 2.15.3**: Advanced charting library for performance analytics and data visualization
+- **Interactive Charts**: Line charts, area charts, bar charts, pie charts with zoom and pan
+- **Responsive Visualizations**: Charts adapt to different screen sizes and orientations
 - **Custom Tooltips**: Detailed hover information for all chart elements
+- **Real-time Updates**: Charts update in real-time as data changes
 
-### Data Management & Storage
+### 💾 Data Management & Storage
 - **Dexie 4.0.11**: Modern IndexedDB wrapper for efficient client-side storage
 - **Local Storage**: Browser storage for settings and lightweight data
-- **Web Workers**: Background processing for heavy calculations
-- **Data Validation**: Runtime type checking and data integrity
+- **Web Workers**: Background processing for heavy calculations and data processing
+- **Data Validation**: Runtime type checking and data integrity verification
+- **Storage Optimization**: Efficient data compression and cleanup routines
 
-### Real-Time Collaboration
+### 🤝 Real-Time Collaboration & Communication
 - **Yjs**: Conflict-free replicated data types (CRDTs) for real-time collaboration
-- **y-webrtc**: WebRTC provider for peer-to-peer synchronization
+- **y-webrtc**: WebRTC provider for peer-to-peer synchronization without servers
 - **Web Speech API**: Browser-native speech recognition for voice note transcription
 - **WebRTC**: Direct peer-to-peer connections for low-latency collaboration
+- **MediaRecorder API**: Native browser recording for voice and video notes
 
-### User Experience & Interaction
-- **@reactour/tour 3.8.0**: Interactive guided tours and onboarding
+### 🎯 User Experience & Interaction
+- **@reactour/tour 3.8.0**: Interactive guided tours and comprehensive onboarding
 - **next-themes 0.4.6**: Dark/light mode with system preference detection
-- **jsPDF 3.0.1**: Client-side PDF generation for trade reports
-- **Drag & Drop**: Native HTML5 drag and drop for image uploads
-
-### Development & Build Tools
-- **ESLint 9**: Advanced code linting with custom rules
-- **PostCSS 8.5.4**: CSS processing and optimization
-- **Autoprefixer**: Automatic vendor prefixing for CSS
-- **TypeScript Strict Mode**: Enhanced type checking and safety
+- **jsPDF 3.0.1**: Client-side PDF generation for professional trade reports
+- **HTML5 Drag & Drop**: Native drag and drop for image uploads and file management
+- **Intersection Observer**: Efficient scroll-based animations and lazy loading
 
 ## 🚀 Installation
 
-### Prerequisites
-- **Node.js 18+**: Latest LTS version recommended
-- **npm 8+** or **yarn 1.22+**: Package manager
-- **Modern Browser**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+### 📋 Prerequisites
+- **Node.js 18+**: Latest LTS version recommended for optimal performance
+- **npm 8+** or **yarn 1.22+**: Package manager for dependency installation
+- **Modern Browser**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ for full feature support
 
-### Local Development
+### 💻 Local Development
 
 1. **Clone the repository**
    ```bash
@@ -284,7 +312,7 @@ The application uses a sophisticated scoring system that considers both the numb
    http://localhost:3000
    ```
 
-### Build for Production
+### 🏗️ Build for Production
 
 ```bash
 # Create optimized production build
@@ -297,7 +325,7 @@ npm run export
 npm start
 ```
 
-### Chrome Extension Setup
+### 🔧 Chrome Extension Setup
 
 1. **Navigate to extension directory**
    ```bash
@@ -312,339 +340,296 @@ npm start
 
 ## 📖 Usage Guide
 
-### Getting Started
+### 🚀 Getting Started
 
-1. **First Visit**: Complete the interactive guided tour to learn all features
-2. **Select a Strategy**: Choose from pre-built strategies or create your own
-3. **Complete Analysis**: Check conditions as they're met in your chart analysis
-4. **Add Context**: Document your trade analysis and attach relevant screenshots
-5. **Review Score**: Verify you've achieved an A+ setup before entering
-6. **Save Trade**: Log your decision with all relevant metadata
-7. **Track Performance**: Monitor your results in the Performance Dashboard
+1. **🎯 First Visit**: Complete the comprehensive interactive guided tour (4+ minutes) to learn all features
+2. **📋 Select Strategy**: Choose from pre-built strategies or create your own custom strategy
+3. **✅ Complete Analysis**: Check conditions as they're met in your chart analysis
+4. **🎙️ Add Voice Notes**: Record quick voice memos explaining your analysis
+5. **📸 Attach Screenshots**: Add up to 3 relevant chart screenshots
+6. **📊 Review Score**: Verify you've achieved an A+ setup before entering
+7. **💾 Save Trade**: Log your decision with all relevant metadata
+8. **📈 Track Performance**: Monitor results in the comprehensive Performance Dashboard
 
-### Strategy Management
+### 🎙️ Voice & Video Notes Workflow
 
-#### Creating Custom Strategies
-1. Click "New Strategy" button in the strategy selector
-2. Enter a descriptive strategy name
-3. Add conditions one by one with appropriate importance levels
-4. Use the condition builder to create detailed criteria
-5. Save and immediately start using your new strategy
+#### 🎤 Recording Voice Notes
+1. **Start Recording**: Click the microphone icon in the trade analysis section
+2. **Speak Clearly**: Record up to 30 seconds of analysis or market observations
+3. **Auto-Transcription**: Watch real-time transcription appear as you speak
+4. **Review & Edit**: Play back the recording and edit the transcript if needed
+5. **Save & Search**: Notes are automatically saved and become searchable
 
-#### Editing Existing Strategies
-1. Select the strategy you want to modify
-2. Click "Edit Strategy" button
-3. Modify conditions, importance levels, or strategy name
-4. Add or remove conditions as needed
-5. Save changes (existing trade history is preserved)
+#### 📹 Creating Video Notes
+1. **Enable Camera**: Grant camera and microphone permissions
+2. **Record Analysis**: Capture your screen and/or camera while explaining your trade
+3. **Visual Review**: Review the video immediately after recording
+4. **Download & Share**: Export videos for external use or mentor review
+5. **Storage Management**: Videos are stored locally with efficient compression
 
-#### Strategy Sharing & Collaboration
-1. **Export Strategy**: Click "Share" → "Export as JSON"
-2. **Generate Share URL**: Create a shareable link for your strategy
-3. **Import Strategy**: Use "Import from File" or "Import from URL"
-4. **Version Control**: Track all changes with automatic versioning
+### 🔥 Tag-Based Heat-Map Analysis
 
-### Risk Calculator Deep Dive
+#### 🏷️ Creating and Managing Tags
+1. **Auto-Tagging**: Tags are automatically suggested based on your trade data
+2. **Custom Tags**: Create custom tags for your specific trading approach
+3. **Tag Categories**: Organize tags by session, pair, setup, outcome, or custom categories
+4. **Color Coding**: Assign colors to tags for visual organization
+5. **Bulk Tagging**: Apply tags to multiple trades simultaneously
 
-#### Setting Up Your Account
-1. **Account Balance**: Enter your current trading account balance
-2. **Risk Percentage**: Use the slider to set your risk per trade (0.1% - 10%)
-3. **Pip Value**: Adjust based on your broker and account currency
+#### 📊 Using Heat-Map Analytics
+1. **Click Any Tag**: Instantly filter all analytics to show only trades with that tag
+2. **Performance Visualization**: See color-coded performance intensity for each tag
+3. **Equity Curve Filtering**: View equity curves filtered to specific tags
+4. **Statistical Analysis**: Get detailed stats including win rate, total P&L, and risk metrics
+5. **Tag Combinations**: Analyze performance of multiple tag combinations
 
-#### Calculating Position Sizes
-1. **Entry Price**: Input your planned entry level
-2. **Stop Loss**: Set your stop loss level
-3. **Take Profit**: Optional take profit target
-4. **Review Results**: 
-   - Position size in lots
-   - Risk amount in dollars
-   - Potential profit/loss
-   - Risk:reward ratio and rating
+### 🤝 Real-Time Collaboration
 
-### Performance Dashboard Analytics
+#### 👥 Setting Up Collaboration
+1. **Create Room**: Generate a unique room ID for your collaboration session
+2. **Share Room ID**: Send the room ID to mentors or trading partners
+3. **Join Room**: Enter the room ID to join an existing collaboration session
+4. **User Presence**: See all connected users with color-coded avatars
+5. **Permission Levels**: Set different permission levels for different users
 
-#### Key Performance Indicators
-- **Total P&L**: Overall profit/loss with color coding
-- **Win Rate**: Percentage of winning trades
-- **Profit Factor**: Ratio of gross profit to gross loss
-- **Sharpe Ratio**: Risk-adjusted return measure
-- **Maximum Drawdown**: Largest peak-to-trough decline
-- **Average Win/Loss**: Mean profit and loss per trade
+#### 💬 Collaborative Analysis
+1. **Live Updates**: See checklist changes in real-time as others make updates
+2. **Cursor Tracking**: Watch where other users are focusing their attention
+3. **Inline Comments**: Leave contextual feedback on specific conditions
+4. **Voice Communication**: Use built-in voice chat during collaboration
+5. **Session Recording**: Record collaboration sessions for later review
 
-#### Interactive Charts
-- **Equity Curve**: Track account growth over time
-- **Strategy Comparison**: Compare performance across strategies
-- **Risk-Reward Distribution**: Visualize R:R ratios
-- **Monthly Performance**: Month-by-month breakdown
+### 📊 Advanced Analytics Usage
 
-#### Advanced Analytics
-- **Drawdown Analysis**: Understand losing periods
-- **Winning/Losing Streaks**: Identify patterns
-- **Session Performance**: Best/worst trading times
-- **Setup Analysis**: Most/least profitable setups
+#### 📈 Performance Dashboard
+1. **Overview Metrics**: Get a quick snapshot of your overall performance
+2. **Interactive Charts**: Zoom, pan, and interact with all performance charts
+3. **Time Period Selection**: Filter analytics by specific date ranges
+4. **Strategy Comparison**: Compare performance across different strategies
+5. **Export Reports**: Generate PDF reports of your performance analytics
 
-### Advanced Filtering & Search
+#### 🎯 Deep Performance Analysis
+1. **Drawdown Analysis**: Understand your losing periods and recovery patterns
+2. **Risk-Adjusted Metrics**: View Sharpe ratio, Calmar ratio, and other risk metrics
+3. **Session Analysis**: See which trading sessions are most profitable for you
+4. **Setup Performance**: Identify your most and least profitable trade setups
+5. **Correlation Analysis**: Understand relationships between different performance factors
 
-#### Multi-dimensional Filtering
-1. **Basic Filters**: Strategy, verdict, outcome, pair, session
-2. **Date Ranges**: Use calendar picker for specific periods
-3. **P&L Ranges**: Filter by profit/loss amounts
-4. **Tag Filtering**: Select multiple tags for precise filtering
-5. **Text Search**: Search through all trade notes
+### 🗓️ Calendar Heat-Map Navigation
 
-#### Calendar Heat-map Usage
-1. **Toggle Calendar**: Show/hide the monthly calendar view
-2. **Color Interpretation**:
-   - Green: Profitable days with A+ setups
-   - Yellow: Breakeven or mixed performance
-   - Red: Losing days or poor setups
-   - Gray: No trading activity
-3. **Detailed Tooltips**: Hover for daily statistics
-4. **Navigation**: Switch between months and years
+#### 📅 Using the Trading Calendar
+1. **Monthly View**: See your entire month's trading performance at a glance
+2. **Color Interpretation**: Green (profitable), yellow (breakeven), red (loss), gray (no trading)
+3. **Daily Details**: Hover over any day to see detailed statistics
+4. **Navigation**: Switch between months and years to analyze long-term patterns
+5. **Goal Tracking**: Set and track monthly trading goals
 
-### Chrome Extension Workflow
+#### 📊 Calendar Analytics
+1. **Pattern Recognition**: Identify patterns in your trading frequency and performance
+2. **Seasonal Analysis**: Understand how different times of year affect your trading
+3. **Consistency Tracking**: Visualize consistency in your trading approach
+4. **Holiday Impact**: See how market holidays affect your performance
+5. **Comparative Analysis**: Compare performance across different time periods
 
-#### Installation & Setup
-1. **Download**: Get the extension from the `chrome-extension` folder
-2. **Install**: Load unpacked extension in Chrome
-3. **Permissions**: Grant access to TradingView
-4. **Pin Extension**: Add to toolbar for quick access
+### 🧮 Risk Management Tools
 
-#### Using on TradingView
-1. **Open TradingView**: Navigate to any chart
-2. **Launch Overlay**: Click extension icon or use right-click menu
-3. **Auto-Detection**: Currency pair automatically detected
-4. **Complete Analysis**: Use the floating checklist overlay
-5. **Save & Sync**: Trades automatically sync with main app
-6. **Drag & Position**: Move overlay for optimal chart viewing
+#### 💰 Position Size Calculator
+1. **Account Setup**: Enter your account balance and preferred risk percentage
+2. **Trade Parameters**: Input entry price, stop loss, and take profit levels
+3. **Risk Assessment**: Get real-time risk level indicators and warnings
+4. **Position Sizing**: Calculate optimal position size based on your risk parameters
+5. **R:R Analysis**: Automatic risk-reward ratio calculation and rating
 
-### Data Management & Backup
-
-#### Automatic Data Persistence
-- **Real-time Saving**: All changes saved immediately
-- **Cross-session Continuity**: Resume where you left off
-- **Data Integrity**: Automatic validation and error recovery
-- **Storage Optimization**: Efficient data compression
-
-#### Manual Backup & Restore
-1. **Export Settings**: Download JSON backup of all settings
-2. **Export Strategies**: Save individual or all strategies
-3. **Import Data**: Restore from previously exported files
-4. **Reset Options**: Clear specific data types or everything
-
-## 💾 Data Persistence
-
-### Storage Architecture
-
-#### LocalStorage (Primary)
-- **Strategies**: All custom and modified strategies
-- **Trade History**: Complete log with metadata
-- **Settings**: User preferences and configurations
-- **Active State**: Current strategy and checklist progress
-- **Filter States**: Saved filter preferences
-
-#### IndexedDB (Secondary)
-- **Images**: Trade screenshots and charts (up to 3 per trade)
-- **Large Datasets**: Performance calculations and analytics
-- **Cache**: Computed metrics and chart data
-- **Offline Data**: Full offline functionality
-
-#### Data Security & Privacy
-- **Local-only Storage**: No data transmitted to external servers
-- **Encryption**: Sensitive data encrypted in storage
-- **Privacy First**: Complete control over your trading data
-- **GDPR Compliant**: No tracking or data collection
-
-### Data Backup Strategies
-
-#### Automatic Backups
-- **Browser Sync**: Data syncs across Chrome instances (if enabled)
-- **Extension Sync**: Chrome extension syncs with main app
-- **Version Control**: Automatic versioning of strategies
-
-#### Manual Backups
-- **JSON Export**: Complete data export in standard format
-- **Selective Export**: Export specific strategies or date ranges
-- **Cloud Storage**: Save backups to your preferred cloud service
-- **Migration Tools**: Easy transfer between devices/browsers
+#### 📊 Portfolio Risk Management
+1. **Total Risk**: Calculate total portfolio risk across multiple open positions
+2. **Risk Budgeting**: Set and track daily, weekly, and monthly risk budgets
+3. **Correlation Analysis**: Understand how different positions correlate
+4. **Stress Testing**: Simulate portfolio performance under different scenarios
+5. **Risk Reporting**: Generate comprehensive risk reports for analysis
 
 ## 🌐 Deployment
 
-### GitHub Pages (Recommended)
+### 🚀 GitHub Pages (Recommended)
 
 The application is optimized for GitHub Pages deployment:
 
 1. **Fork Repository**: Create your own copy on GitHub
 2. **Enable Pages**: Settings → Pages → Source: GitHub Actions
-3. **Automatic Deployment**: Push to main branch triggers build
-4. **Custom Domain**: Optional custom domain configuration
-5. **HTTPS**: Automatic SSL certificate provisioning
+3. **Automatic Deployment**: Push to main branch triggers build and deployment
+4. **Custom Domain**: Optional custom domain configuration with SSL
+5. **Global CDN**: Automatic global content delivery network
 
-### Vercel Deployment
+### ⚡ Vercel Deployment
 
-For enhanced performance and features:
+For enhanced performance and advanced features:
 
 1. **Connect Repository**: Link your GitHub fork to Vercel
-2. **Automatic Builds**: Every push triggers new deployment
-3. **Preview Deployments**: Test changes before going live
-4. **Analytics**: Built-in performance monitoring
-5. **Edge Functions**: Global CDN for optimal performance
+2. **Automatic Builds**: Every push triggers new deployment with preview
+3. **Edge Functions**: Global edge computing for optimal performance
+4. **Analytics**: Built-in performance monitoring and user analytics
+5. **Custom Domains**: Easy custom domain setup with automatic SSL
 
-### Self-hosted Options
+### 🏠 Self-Hosted Options
 
-For complete control:
+For complete control and customization:
 
 ```bash
 # Build for production
 npm run build
 
 # Serve with any static hosting solution
-# Examples: nginx, Apache, Caddy, etc.
+# Examples: nginx, Apache, Caddy, AWS S3, etc.
 ```
 
-### Supported Platforms
-- **GitHub Pages** ✅ (Free, automatic SSL)
-- **Vercel** ✅ (Enhanced performance, analytics)
-- **Netlify** ✅ (Form handling, edge functions)
-- **AWS S3 + CloudFront** ✅ (Enterprise scale)
-- **Any Static Host** ✅ (nginx, Apache, etc.)
+### 🌍 Supported Platforms
+- **GitHub Pages** ✅ (Free, automatic SSL, perfect for personal use)
+- **Vercel** ✅ (Enhanced performance, analytics, edge functions)
+- **Netlify** ✅ (Form handling, edge functions, continuous deployment)
+- **AWS S3 + CloudFront** ✅ (Enterprise scale, global distribution)
+- **Any Static Host** ✅ (nginx, Apache, IIS, etc.)
 
 ## 🤝 Contributing
 
-### Development Setup
+### 🛠️ Development Setup
 
 1. **Fork & Clone**: Create your own copy of the repository
 2. **Install Dependencies**: `npm install` or `yarn install`
-3. **Start Development**: `npm run dev` for hot reloading
+3. **Start Development**: `npm run dev` for hot reloading and fast refresh
 4. **Create Branch**: `git checkout -b feature/amazing-feature`
-5. **Make Changes**: Follow the established patterns and conventions
-6. **Test Thoroughly**: Ensure all features work correctly
+5. **Make Changes**: Follow established patterns and conventions
+6. **Test Thoroughly**: Ensure all features work correctly across browsers
 7. **Submit PR**: Open a pull request with detailed description
 
-### Code Standards & Guidelines
+### 📏 Code Standards & Guidelines
 
-#### TypeScript Requirements
+#### 🔷 TypeScript Requirements
 - **Strict Mode**: All code must pass TypeScript strict checks
-- **Type Safety**: Proper typing for all functions and components
-- **Interface Definitions**: Clear interfaces for all data structures
-- **Generic Types**: Use generics for reusable components
+- **Type Safety**: Proper typing for all functions, components, and data structures
+- **Interface Definitions**: Clear interfaces for all data structures with JSDoc
+- **Generic Types**: Use generics for reusable components and utilities
 
-#### Component Architecture
-- **shadcn/ui Patterns**: Follow established component patterns
-- **Composition**: Prefer composition over inheritance
-- **Props Interface**: Clear prop interfaces with JSDoc comments
-- **Error Boundaries**: Proper error handling in components
+#### 🧩 Component Architecture
+- **shadcn/ui Patterns**: Follow established component patterns and conventions
+- **Composition over Inheritance**: Prefer composition patterns for flexibility
+- **Props Interface**: Clear prop interfaces with comprehensive JSDoc comments
+- **Error Boundaries**: Proper error handling and graceful degradation
 
-#### Performance Guidelines
+#### ⚡ Performance Guidelines
 - **React Optimization**: Use React.memo, useMemo, useCallback appropriately
-- **Bundle Size**: Monitor and optimize bundle size
-- **Lazy Loading**: Implement code splitting for large components
-- **Web Workers**: Use workers for heavy computations
+- **Bundle Size**: Monitor and optimize bundle size with webpack-bundle-analyzer
+- **Lazy Loading**: Implement code splitting for large components and routes
+- **Web Workers**: Use workers for heavy computations and data processing
 
-#### Accessibility Standards
-- **WCAG 2.1 AA**: Meet accessibility guidelines
-- **Keyboard Navigation**: Full keyboard accessibility
-- **Screen Readers**: Proper ARIA labels and descriptions
-- **Color Contrast**: Ensure sufficient contrast ratios
+#### ♿ Accessibility Standards
+- **WCAG 2.1 AA**: Meet or exceed accessibility guidelines
+- **Keyboard Navigation**: Full keyboard accessibility for all features
+- **Screen Readers**: Proper ARIA labels, descriptions, and semantic HTML
+- **Color Contrast**: Ensure sufficient contrast ratios for all text and UI elements
 
-### Feature Development Process
+### 🔄 Feature Development Process
 
-#### Planning Phase
-1. **Issue Creation**: Create detailed GitHub issue
-2. **Requirements**: Define clear acceptance criteria
-3. **Design Review**: Discuss UI/UX implications
-4. **Technical Design**: Plan implementation approach
+#### 📋 Planning Phase
+1. **Issue Creation**: Create detailed GitHub issue with acceptance criteria
+2. **Requirements Analysis**: Define clear functional and technical requirements
+3. **Design Review**: Discuss UI/UX implications and user experience
+4. **Technical Design**: Plan implementation approach and architecture
 
-#### Implementation Phase
-1. **Branch Creation**: Use descriptive branch names
-2. **Incremental Commits**: Small, focused commits
-3. **Testing**: Unit tests and integration tests
-4. **Documentation**: Update README and code comments
+#### 🔨 Implementation Phase
+1. **Branch Creation**: Use descriptive branch names following conventions
+2. **Incremental Commits**: Small, focused commits with clear messages
+3. **Testing**: Comprehensive testing including unit and integration tests
+4. **Documentation**: Update README, code comments, and inline documentation
 
-#### Review Phase
-1. **Self Review**: Test all functionality thoroughly
-2. **Code Review**: Address reviewer feedback
-3. **Testing**: Ensure no regressions
-4. **Deployment**: Merge after approval
+#### 🔍 Review Phase
+1. **Self Review**: Thoroughly test all functionality across different browsers
+2. **Code Review**: Address reviewer feedback and suggestions
+3. **Regression Testing**: Ensure no existing functionality is broken
+4. **Deployment**: Merge after approval and successful CI/CD pipeline
 
-### Bug Reports & Feature Requests
+### 🐛 Bug Reports & Feature Requests
 
-#### Bug Reports
-- **Reproduction Steps**: Clear steps to reproduce
-- **Expected Behavior**: What should happen
-- **Actual Behavior**: What actually happens
-- **Environment**: Browser, OS, version information
-- **Screenshots**: Visual evidence when applicable
+#### 🚨 Bug Reports
+Please include:
+- **Reproduction Steps**: Clear, step-by-step instructions to reproduce the issue
+- **Expected Behavior**: What should happen in the scenario
+- **Actual Behavior**: What actually happens, including error messages
+- **Environment**: Browser version, OS, device type, screen resolution
+- **Screenshots/Videos**: Visual evidence when applicable
 
-#### Feature Requests
-- **Use Case**: Explain the problem being solved
-- **Proposed Solution**: Describe the desired feature
-- **Alternatives**: Consider alternative approaches
-- **Impact**: Estimate user benefit and development effort
+#### 💡 Feature Requests
+Please provide:
+- **Use Case**: Explain the problem being solved and user benefit
+- **Proposed Solution**: Describe the desired feature in detail
+- **Alternative Solutions**: Consider alternative approaches or workarounds
+- **Impact Assessment**: Estimate user benefit and development effort required
 
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
 
 ### License Summary
-- ✅ **Commercial Use**: Use in commercial projects
-- ✅ **Modification**: Modify and adapt the code
+- ✅ **Commercial Use**: Use in commercial projects and products
+- ✅ **Modification**: Modify and adapt the code for your needs
 - ✅ **Distribution**: Distribute original or modified versions
 - ✅ **Private Use**: Use for private/personal projects
 - ❗ **Liability**: No warranty or liability provided
-- ❗ **Attribution**: Include original license and copyright
+- ❗ **Attribution**: Include original license and copyright notice
 
 ## 🙏 Acknowledgments
 
-### Core Technologies
+### 🚀 Core Technologies
 - **[Next.js Team](https://nextjs.org/)**: For the excellent React framework and developer experience
 - **[shadcn/ui](https://ui.shadcn.com/)**: For the beautiful, accessible component library
-- **[Radix UI](https://www.radix-ui.com/)**: For the unstyled, accessible primitives
+- **[Radix UI](https://www.radix-ui.com/)**: For the unstyled, accessible UI primitives
 - **[Tailwind CSS](https://tailwindcss.com/)**: For the utility-first CSS framework
 
-### Libraries & Tools
-- **[Recharts](https://recharts.org/)**: For powerful data visualization components
-- **[Dexie](https://dexie.org/)**: For elegant IndexedDB wrapper
+### 📚 Libraries & Tools
+- **[Recharts](https://recharts.org/)**: For powerful, responsive data visualization
+- **[Dexie](https://dexie.org/)**: For elegant IndexedDB wrapper and offline storage
 - **[jsPDF](https://github.com/parallax/jsPDF)**: For client-side PDF generation
-- **[Lucide](https://lucide.dev/)**: For beautiful, consistent icons
+- **[Lucide](https://lucide.dev/)**: For beautiful, consistent icon library
+- **[Yjs](https://github.com/yjs/yjs)**: For conflict-free replicated data types
 
-### Community & Inspiration
-- **Trading Community**: For valuable feedback and feature suggestions
-- **Open Source Contributors**: For bug reports and improvements
-- **Beta Testers**: For early feedback and testing
+### 🌟 Community & Inspiration
+- **Trading Community**: For valuable feedback, feature suggestions, and beta testing
+- **Open Source Contributors**: For bug reports, improvements, and code contributions
+- **Mentor Network**: For guidance on trading best practices and educational content
 
 ## 📞 Support & Community
 
-### Getting Help
-- **📚 Documentation**: Comprehensive README and inline code comments
+### 🆘 Getting Help
+- **📚 Documentation**: Comprehensive README and inline code documentation
 - **🐛 Bug Reports**: [GitHub Issues](https://github.com/veindevttv/trading-checklist-app/issues)
 - **💬 Discussions**: [GitHub Discussions](https://github.com/veindevttv/trading-checklist-app/discussions)
-- **📧 Direct Contact**: Create an issue for direct support
+- **📧 Direct Support**: Create an issue for direct support and assistance
 
-### Community Guidelines
-- **Be Respectful**: Treat all community members with respect
-- **Stay On Topic**: Keep discussions relevant to the project
-- **Help Others**: Share knowledge and assist fellow traders
-- **Provide Feedback**: Constructive feedback helps improve the project
+### 🤝 Community Guidelines
+- **Be Respectful**: Treat all community members with respect and professionalism
+- **Stay On Topic**: Keep discussions relevant to the project and trading analysis
+- **Help Others**: Share knowledge and assist fellow traders in the community
+- **Provide Feedback**: Constructive feedback helps improve the project for everyone
 
-### Roadmap & Future Features
-- **Mobile App**: Native iOS/Android applications
-- **Cloud Sync**: Optional cloud synchronization
-- **Advanced Analytics**: Machine learning insights
-- **Broker Integration**: Direct broker API connections
-- **Social Features**: Strategy sharing community
-- **Backtesting**: Historical strategy testing
+### 🗺️ Roadmap & Future Features
+- **📱 Mobile App**: Native iOS/Android applications with full feature parity
+- **☁️ Cloud Sync**: Optional cloud synchronization across devices
+- **🤖 AI Insights**: Machine learning-powered trading insights and pattern recognition
+- **🔌 Broker Integration**: Direct broker API connections for live data and execution
+- **👥 Social Features**: Strategy sharing community and social trading features
+- **📊 Advanced Backtesting**: Historical strategy testing with comprehensive analytics
 
 ---
 
 ## 🎯 Quick Start Summary
 
 1. **🌐 Try Online**: Visit [trading-checklist-app.vercel.app](https://trading-checklist-app.vercel.app/)
-2. **📱 Install Extension**: Load the Chrome extension for TradingView integration
-3. **🎯 Select Strategy**: Choose or create your trading strategy
-4. **✅ Complete Checklist**: Check conditions as they're met
-5. **📊 Track Performance**: Monitor your results and improve over time
+2. **🎯 Take the Tour**: Complete the 4-minute interactive guided tour
+3. **📋 Select Strategy**: Choose or create your trading strategy
+4. **🎙️ Record Notes**: Add voice/video notes to your analysis
+5. **✅ Complete Checklist**: Check conditions as they're met
+6. **🔥 Analyze Tags**: Use tag-based heat-maps for performance insights
+7. **🤝 Collaborate**: Invite mentors for real-time collaboration
+8. **📊 Track Performance**: Monitor results and improve over time
 
 **Happy Trading! 📈**
 
-*Remember: This tool is designed to help with analysis and decision-making. Always do your own research, practice proper risk management, and never risk more than you can afford to lose.*
+*Remember: This tool is designed to help with analysis and decision-making. Always do your own research, practice proper risk management, and never risk more than you can afford to lose. Past performance does not guarantee future results.*
