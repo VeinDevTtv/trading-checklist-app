@@ -35,7 +35,10 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.3",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "y-protocols": "^1.0.6",
+    "y-webrtc": "^10.3.0",
+    "yjs": "^13.6.27"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

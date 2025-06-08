@@ -29,6 +29,7 @@ A comprehensive, professional-grade trading checklist application designed to he
 - **PDF Export**: Export your checklist analysis as professional PDF reports with jsPDF integration
 - **Real-time Scoring**: Live calculation of trade confidence levels with instant feedback
 - **Image Attachments**: Add up to 3 screenshots and charts to your trade analysis with drag-drop support and IndexedDB storage
+- **Voice & Video Notes**: Record 30-second audio/video snippets with automatic transcription via Web Speech API
 - **Strategy Versioning**: Full revision history with restore capability for all strategy modifications
 - **Strategy Sharing**: Export/import strategies via JSON files or shareable URLs with metadata
 
@@ -44,6 +45,7 @@ A comprehensive, professional-grade trading checklist application designed to he
 - **Risk-Reward Distribution Analysis**: Visual breakdown of R:R ratios across all trades
 - **Outcome Distribution Charts**: Pie charts showing win/loss/breakeven percentages
 - **Monthly Performance Summaries**: Detailed monthly breakdowns with key statistics
+- **Tag-Based Heat-Maps**: Click any tag ("London session", "XAUUSD") to see win-rate & equity curve filtered to that tag
 - **Web Worker Integration**: Heavy calculations run in background for smooth UI performance
 - **Performance Caching**: Intelligent caching system for faster dashboard loading
 
@@ -95,6 +97,18 @@ A comprehensive, professional-grade trading checklist application designed to he
 - **Visual Risk Indicators**: Color-coded risk levels and R:R ratings
 - **Real-time Calculations**: Instant updates as you modify trade parameters
 - **Educational Content**: Built-in risk management tips and best practices
+
+### 🤝 Real-Time Collaboration Rooms
+
+- **Live Collaboration**: Work with mentors and other traders in real-time using Yjs + WebRTC technology
+- **Synchronized Checklists**: See checklist updates, notes, and cursor movements instantly across all connected users
+- **Inline Comments System**: Leave feedback and questions with threaded comments on specific conditions
+- **User Presence Indicators**: See who's online with color-coded user avatars and activity status
+- **Cursor Tracking**: Real-time cursor positions show where other users are focusing
+- **Room Management**: Create private rooms or join existing ones with simple room IDs
+- **Comment Resolution**: Mark comments as resolved to keep discussions organized
+- **Peer-to-Peer Connection**: Direct WebRTC connections for low-latency, secure collaboration
+- **No Server Required**: Fully decentralized collaboration without external dependencies
 
 ### ⚙️ Application Settings & Customization
 
@@ -217,6 +231,12 @@ The application uses a sophisticated scoring system that considers both the numb
 - **Local Storage**: Browser storage for settings and lightweight data
 - **Web Workers**: Background processing for heavy calculations
 - **Data Validation**: Runtime type checking and data integrity
+
+### Real-Time Collaboration
+- **Yjs**: Conflict-free replicated data types (CRDTs) for real-time collaboration
+- **y-webrtc**: WebRTC provider for peer-to-peer synchronization
+- **Web Speech API**: Browser-native speech recognition for voice note transcription
+- **WebRTC**: Direct peer-to-peer connections for low-latency collaboration
 
 ### User Experience & Interaction
 - **@reactour/tour 3.8.0**: Interactive guided tours and onboarding

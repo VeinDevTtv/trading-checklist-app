@@ -22,6 +22,9 @@ import { ImageAttachment } from "@/components/image-attachment";
 import { OnboardingTour, TourControls } from "@/components/onboarding-tour";
 import { TradeFilters, useTradeFilters, type TradeFilters as TradeFiltersType, type EnhancedTradeLog, type TradeTag } from "@/components/trade-filters";
 import { CalendarHeatmap } from "@/components/calendar-heatmap";
+import { VoiceVideoNotes } from "@/components/voice-video-notes";
+import { TagHeatmap } from "@/components/tag-heatmap";
+import { CollaborationRoom } from "@/components/collaboration-room";
 import { StrategyVersionManager } from "@/lib/strategy-versioning";
 import { ImageStorageManager, TradeImage } from "@/lib/image-storage";
 import { 
@@ -32,13 +35,13 @@ import {
   TrendingDown,
   History, 
   Calculator,
-  Settings as SettingsIcon,
   Plus,
   Edit,
   Download,
   Star,
   Filter,
-  Calendar
+  Calendar,
+  Target
 } from "lucide-react";
 import jsPDF from "jspdf";
 
@@ -56,6 +59,17 @@ interface Strategy {
   id: string;
   name: string;
   conditions: Condition[];
+}
+
+interface VoiceVideoNote {
+  id: string;
+  type: 'voice' | 'video';
+  blob: Blob;
+  url: string;
+  duration: number;
+  timestamp: string;
+  transcription?: string;
+  isTranscribing?: boolean;
 }
 
 interface TradeLog {
@@ -77,6 +91,7 @@ interface TradeLog {
   session?: 'london' | 'new-york' | 'tokyo' | 'sydney';
   dayOfWeek?: string;
   setup?: string;
+  voiceVideoNotes?: VoiceVideoNote[];
 }
 
 // -------------------- Constants --------------------
@@ -176,6 +191,9 @@ export default function TradingChecklistApp() {
   // images
   const [tradeImages, setTradeImages] = useState<TradeImage[]>([]);
 
+  // voice/video notes
+  const [voiceVideoNotes, setVoiceVideoNotes] = useState<VoiceVideoNote[]>([]);
+
   // new strategy builder state
   const [newName, setNewName] = useState("");
   const [builderConds, setBuilderConds] = useState<Condition[]>([]);
@@ -198,6 +216,9 @@ export default function TradingChecklistApp() {
 
   // refresh trigger for components
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // collaboration state
+  const [isCollaborationEnabled, setIsCollaborationEnabled] = useState(false);
 
   // filtering state
   const [showFilters, setShowFilters] = useState(false);
@@ -359,6 +380,7 @@ export default function TradingChecklistApp() {
       verdict,
       timestamp: new Date().toLocaleString(),
       imageIds: tradeImages.map(img => img.imageId),
+      voiceVideoNotes: voiceVideoNotes.length > 0 ? voiceVideoNotes : undefined,
     };
 
     // Save images to IndexedDB with the trade ID
@@ -378,6 +400,7 @@ export default function TradingChecklistApp() {
     setCheckedIds([]);
     setNotes("");
     setTradeImages([]);
+    setVoiceVideoNotes([]);
   };
 
   // export
@@ -606,9 +629,9 @@ export default function TradingChecklistApp() {
               <History className="h-4 w-4" />
               Trade History
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
-              <SettingsIcon className="h-4 w-4" />
-              Settings
+            <TabsTrigger value="tags" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+              <Target className="h-4 w-4" />
+              Tag Analysis
             </TabsTrigger>
           </TabsList>
 
@@ -730,6 +753,25 @@ export default function TradingChecklistApp() {
                       maxImages={3}
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <VoiceVideoNotes
+                      notes={voiceVideoNotes}
+                      onNotesChange={setVoiceVideoNotes}
+                      maxDuration={30}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <CollaborationRoom
+                      checkedIds={checkedIds}
+                      notes={notes}
+                      onCheckedIdsChange={setCheckedIds}
+                      onNotesChange={setNotes}
+                      isEnabled={isCollaborationEnabled}
+                      onToggle={() => setIsCollaborationEnabled(!isCollaborationEnabled)}
+                    />
+                  </div>
                 </div>
 
                 <Separator />
@@ -782,6 +824,11 @@ export default function TradingChecklistApp() {
           {/* Performance Dashboard Tab */}
           <TabsContent value="performance">
             <PerformanceDashboard trades={history} key={refreshTrigger} />
+          </TabsContent>
+
+          {/* Tag Analysis Tab */}
+          <TabsContent value="tags">
+            <TagHeatmap trades={history} />
           </TabsContent>
 
           {/* Trade History Tab */}
