@@ -617,7 +617,7 @@ export default function TradingChecklistApp() {
               <CheckCircle className="h-4 w-4" />
               Checklist
             </TabsTrigger>
-            <TabsTrigger value="calculator" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+            <TabsTrigger value="calculator" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap" data-tour="calculator-tab">
               <Calculator className="h-4 w-4" />
               Risk Calculator
             </TabsTrigger>
@@ -625,11 +625,11 @@ export default function TradingChecklistApp() {
               <TrendingUp className="h-4 w-4" />
               Performance
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+            <TabsTrigger value="history" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap" data-tour="history-tab">
               <History className="h-4 w-4" />
               Trade History
             </TabsTrigger>
-            <TabsTrigger value="tags" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+            <TabsTrigger value="tags" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap" data-tour="tags-tab">
               <Target className="h-4 w-4" />
               Tag Analysis
             </TabsTrigger>
