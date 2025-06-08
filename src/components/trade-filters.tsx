@@ -197,12 +197,12 @@ export function TradeFilters({
           {/* Strategy */}
           <div className="space-y-2">
             <Label>Strategy</Label>
-            <Select value={filters.strategy} onValueChange={(value) => updateFilter('strategy', value)}>
+            <Select value={filters.strategy || 'all'} onValueChange={(value) => updateFilter('strategy', value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="All strategies" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All strategies</SelectItem>
+                <SelectItem value="all">All strategies</SelectItem>
                 {uniqueValues.strategies.map(strategy => (
                   <SelectItem key={strategy} value={strategy}>{strategy}</SelectItem>
                 ))}
@@ -213,12 +213,12 @@ export function TradeFilters({
           {/* Verdict */}
           <div className="space-y-2">
             <Label>Verdict</Label>
-            <Select value={filters.verdict} onValueChange={(value) => updateFilter('verdict', value)}>
+            <Select value={filters.verdict || 'all'} onValueChange={(value) => updateFilter('verdict', value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="All verdicts" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All verdicts</SelectItem>
+                <SelectItem value="all">All verdicts</SelectItem>
                 <SelectItem value="A+">A+ Setup</SelectItem>
                 <SelectItem value="Not A+">Not A+</SelectItem>
               </SelectContent>
@@ -234,12 +234,12 @@ export function TradeFilters({
               {/* Outcome */}
               <div className="space-y-2">
                 <Label>Outcome</Label>
-                <Select value={filters.outcome} onValueChange={(value) => updateFilter('outcome', value)}>
+                <Select value={filters.outcome || 'all'} onValueChange={(value) => updateFilter('outcome', value === 'all' ? '' : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="All outcomes" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All outcomes</SelectItem>
+                    <SelectItem value="all">All outcomes</SelectItem>
                     <SelectItem value="win">
                       <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-green-600" />
@@ -265,12 +265,12 @@ export function TradeFilters({
               {/* Pair */}
               <div className="space-y-2">
                 <Label>Currency Pair</Label>
-                <Select value={filters.pair} onValueChange={(value) => updateFilter('pair', value)}>
+                <Select value={filters.pair || 'all'} onValueChange={(value) => updateFilter('pair', value === 'all' ? '' : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="All pairs" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All pairs</SelectItem>
+                    <SelectItem value="all">All pairs</SelectItem>
                     {uniqueValues.pairs.map(pair => (
                       <SelectItem key={pair} value={pair}>{pair}</SelectItem>
                     ))}
@@ -281,12 +281,12 @@ export function TradeFilters({
               {/* Session */}
               <div className="space-y-2">
                 <Label>Trading Session</Label>
-                <Select value={filters.session} onValueChange={(value) => updateFilter('session', value)}>
+                <Select value={filters.session || 'all'} onValueChange={(value) => updateFilter('session', value === 'all' ? '' : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="All sessions" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All sessions</SelectItem>
+                    <SelectItem value="all">All sessions</SelectItem>
                     <SelectItem value="london">London</SelectItem>
                     <SelectItem value="new-york">New York</SelectItem>
                     <SelectItem value="tokyo">Tokyo</SelectItem>
@@ -298,12 +298,12 @@ export function TradeFilters({
               {/* Day of Week */}
               <div className="space-y-2">
                 <Label>Day of Week</Label>
-                <Select value={filters.dayOfWeek} onValueChange={(value) => updateFilter('dayOfWeek', value)}>
+                <Select value={filters.dayOfWeek || 'all'} onValueChange={(value) => updateFilter('dayOfWeek', value === 'all' ? '' : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="All days" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All days</SelectItem>
+                    <SelectItem value="all">All days</SelectItem>
                     {dayOfWeekOptions.map(day => (
                       <SelectItem key={day} value={day}>{day}</SelectItem>
                     ))}
