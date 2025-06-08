@@ -15,6 +15,15 @@ import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/mode-toggle";
 import { RiskCalculator } from "@/components/risk-calculator";
 import { Settings } from "@/components/settings";
+import { PerformanceDashboard } from "@/components/performance-dashboard";
+import { StrategyHistoryModal } from "@/components/strategy-history-modal";
+import { StrategySharingComponent } from "@/components/strategy-sharing";
+import { ImageAttachment } from "@/components/image-attachment";
+import { OnboardingTour, TourControls } from "@/components/onboarding-tour";
+import { TradeFilters, useTradeFilters, type TradeFilters as TradeFiltersType, type EnhancedTradeLog, type TradeTag } from "@/components/trade-filters";
+import { CalendarHeatmap } from "@/components/calendar-heatmap";
+import { StrategyVersionManager } from "@/lib/strategy-versioning";
+import { ImageStorageManager, TradeImage } from "@/lib/image-storage";
 import { 
   Trash2, 
   CheckCircle, 
@@ -26,7 +35,10 @@ import {
   Plus,
   Edit,
   Download,
-  Star
+  Star,
+  Filter,
+  Calendar,
+  RotateCcw
 } from "lucide-react";
 import jsPDF from "jspdf";
 
@@ -55,6 +67,16 @@ interface TradeLog {
   notes: string;
   verdict: string;
   timestamp: string;
+  pnl?: number;
+  riskAmount?: number;
+  outcome?: 'win' | 'loss' | 'breakeven';
+  riskRewardRatio?: number;
+  imageIds?: string[];
+  tags?: string[];
+  pair?: string;
+  session?: 'london' | 'new-york' | 'tokyo' | 'sydney';
+  dayOfWeek?: string;
+  setup?: string;
 }
 
 // -------------------- Constants --------------------
@@ -147,10 +169,45 @@ export default function TradingChecklistApp() {
   // dialogs
   const [openNew, setOpenNew] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openHistory, setOpenHistory] = useState(false);
+  const [openSharing, setOpenSharing] = useState(false);
+
+  // images
+  const [tradeImages, setTradeImages] = useState<TradeImage[]>([]);
 
   // new strategy builder state
   const [newName, setNewName] = useState("");
   const [builderConds, setBuilderConds] = useState<Condition[]>([]);
+
+  // onboarding state
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+
+  // filtering state
+  const [showFilters, setShowFilters] = useState(false);
+  const [tradeFilters, setTradeFilters] = useState<TradeFiltersType>({
+    search: '',
+    strategy: '',
+    verdict: '',
+    outcome: '',
+    pair: '',
+    session: '',
+    dayOfWeek: '',
+    tags: [],
+    dateFrom: '',
+    dateTo: '',
+    pnlMin: '',
+    pnlMax: '',
+  });
+  const [availableTags, setAvailableTags] = useState<TradeTag[]>([]);
+
+  // calendar state
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
+
+  // Filtered trades
+  const filteredTrades = useTradeFilters(history as EnhancedTradeLog[], tradeFilters);
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -166,6 +223,13 @@ export default function TradingChecklistApp() {
     setCheckedIds(loadedCheckedIds);
     setNotes(loadedNotes);
     setIsLoaded(true);
+
+    // Check if this is the first visit
+    const hasVisited = localStorage.getItem('trading-checklist-visited');
+    if (!hasVisited) {
+      setIsFirstVisit(true);
+      localStorage.setItem('trading-checklist-visited', 'true');
+    }
   }, []);
 
   // Save strategies to localStorage whenever they change
@@ -272,7 +336,7 @@ export default function TradingChecklistApp() {
   const percentage = possibleScore > 0 ? Math.round((score / possibleScore) * 100) : 0;
 
   // save trade
-  const saveTrade = () => {
+  const saveTrade = async () => {
     const trade: TradeLog = {
       id: Date.now(),
       strategyName: activeStrategy.name,
@@ -282,11 +346,26 @@ export default function TradingChecklistApp() {
       notes,
       verdict,
       timestamp: new Date().toLocaleString(),
+      imageIds: tradeImages.map(img => img.imageId),
     };
+
+    // Save images to IndexedDB with the trade ID
+    try {
+      for (const image of tradeImages) {
+        if (image.imageId.startsWith('temp_')) {
+          // Save temporary images permanently
+          await ImageStorageManager.saveImage(trade.id, image.blob, image.filename);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to save trade images:', error);
+    }
+
     setHistory([trade, ...history]);
     // reset
     setCheckedIds([]);
     setNotes("");
+    setTradeImages([]);
   };
 
   // export
@@ -333,7 +412,20 @@ export default function TradingChecklistApp() {
     setBuilderConds([]);
   };
 
-  const saveEditedStrategy = () => {
+  const saveEditedStrategy = async () => {
+    const strategyData = { name: newName, conditions: builderConds };
+    
+    // Save revision to version history
+    try {
+      await StrategyVersionManager.saveRevision(
+        activeId, 
+        strategyData, 
+        "Strategy edited via builder"
+      );
+    } catch (error) {
+      console.warn('Failed to save strategy revision:', error);
+    }
+
     const updated = strategies.map((s) =>
       s.id === activeId ? { ...s, name: newName, conditions: builderConds } : s
     );
@@ -359,6 +451,21 @@ export default function TradingChecklistApp() {
     }
   };
 
+  // Onboarding handlers
+  const handleTourComplete = () => {
+    setIsFirstVisit(false);
+    setShowTour(false);
+  };
+
+  // Tag management
+  const handleCreateTag = (tag: Omit<TradeTag, 'id'>) => {
+    const newTag: TradeTag = {
+      ...tag,
+      id: `custom-${Date.now()}`
+    };
+    setAvailableTags(prev => [...prev, newTag]);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -372,6 +479,7 @@ export default function TradingChecklistApp() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <TourControls />
               <ModeToggle />
             </div>
           </div>
@@ -381,7 +489,7 @@ export default function TradingChecklistApp() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="checklist" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="checklist" className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4" />
               Checklist
@@ -389,6 +497,10 @@ export default function TradingChecklistApp() {
             <TabsTrigger value="calculator" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               Risk Calculator
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="flex items-center gap-2" data-tour="performance-tab">
+              <TrendingUp className="h-4 w-4" />
+              Performance
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="h-4 w-4" />
@@ -412,7 +524,7 @@ export default function TradingChecklistApp() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4 flex-wrap gap-4">
-                  <Select value={activeId} onValueChange={(v) => setActiveId(v)}>
+                  <Select value={activeId} onValueChange={(v) => setActiveId(v)} data-tour="strategy-selector">
                     <SelectTrigger className="w-64">
                       <SelectValue placeholder="Select strategy" />
                     </SelectTrigger>
@@ -424,13 +536,21 @@ export default function TradingChecklistApp() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Button onClick={() => setOpenNew(true)} className="flex items-center gap-2">
+                  <Button onClick={() => setOpenNew(true)} className="flex items-center gap-2" data-tour="new-strategy">
                     <Plus className="h-4 w-4" />
                     New Strategy
                   </Button>
                   <Button variant="outline" onClick={startEdit} className="flex items-center gap-2">
                     <Edit className="h-4 w-4" />
                     Edit Strategy
+                  </Button>
+                  <Button variant="outline" onClick={() => setOpenHistory(true)} className="flex items-center gap-2">
+                    <History className="h-4 w-4" />
+                    History
+                  </Button>
+                  <Button variant="outline" onClick={() => setOpenSharing(true)} className="flex items-center gap-2" data-tour="share-strategy">
+                    <Star className="h-4 w-4" />
+                    Share
                   </Button>
                   <Button variant="destructive" size="sm" onClick={clearAllData}>
                     Clear All Data
@@ -440,7 +560,7 @@ export default function TradingChecklistApp() {
             </Card>
 
             {/* Checklist Card */}
-            <Card>
+            <Card data-tour="checklist">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
@@ -482,7 +602,7 @@ export default function TradingChecklistApp() {
 
                 <Separator />
 
-                <div className="space-y-4">
+                <div className="space-y-4" data-tour="notes">
                   <Label htmlFor="notes">Trade Notes</Label>
                   <Textarea
                     id="notes"
@@ -491,6 +611,15 @@ export default function TradingChecklistApp() {
                     onChange={(e) => setNotes(e.target.value)}
                     className="min-h-[100px]"
                   />
+                  
+                  <div className="space-y-2">
+                    <Label>Screenshots & Charts</Label>
+                    <ImageAttachment
+                      images={tradeImages}
+                      onImagesChange={setTradeImages}
+                      maxImages={3}
+                    />
+                  </div>
                 </div>
 
                 <Separator />
@@ -505,7 +634,7 @@ export default function TradingChecklistApp() {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button onClick={saveTrade} className="flex items-center gap-2">
+                    <Button onClick={saveTrade} className="flex items-center gap-2" data-tour="save-trade">
                       <CheckCircle className="h-4 w-4" />
                       Save Trade
                     </Button>
@@ -524,25 +653,81 @@ export default function TradingChecklistApp() {
             <RiskCalculator />
           </TabsContent>
 
+          {/* Performance Dashboard Tab */}
+          <TabsContent value="performance">
+            <PerformanceDashboard trades={history} />
+          </TabsContent>
+
           {/* Trade History Tab */}
           <TabsContent value="history" className="space-y-6">
+            {/* Filter Controls */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5" />
-                  Trade History
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Trade History
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowFilters(!showFilters)}
+                      className="flex items-center gap-2"
+                    >
+                      <Filter className="h-4 w-4" />
+                      {showFilters ? 'Hide Filters' : 'Show Filters'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                      className="flex items-center gap-2"
+                    >
+                      <Calendar className="h-4 w-4" />
+                      {showCalendar ? 'Hide Calendar' : 'Show Calendar'}
+                    </Button>
+                  </div>
                 </CardTitle>
               </CardHeader>
+            </Card>
+
+            {/* Trade Filters */}
+            {showFilters && (
+              <TradeFilters
+                trades={history as EnhancedTradeLog[]}
+                filters={tradeFilters}
+                onFiltersChange={setTradeFilters}
+                availableTags={availableTags}
+                onCreateTag={handleCreateTag}
+              />
+            )}
+
+            {/* Calendar Heatmap */}
+            {showCalendar && (
+              <CalendarHeatmap
+                trades={history as EnhancedTradeLog[]}
+                year={calendarYear}
+                month={calendarMonth}
+              />
+            )}
+
+            {/* Trade List */}
+            <Card>
               <CardContent>
-                {history.length === 0 ? (
+                {filteredTrades.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No trades logged yet.</p>
-                    <p className="text-sm">Start by completing a checklist and saving your first trade!</p>
+                    <p>{history.length === 0 ? 'No trades logged yet.' : 'No trades match your filters.'}</p>
+                    <p className="text-sm">
+                      {history.length === 0 
+                        ? 'Start by completing a checklist and saving your first trade!' 
+                        : 'Try adjusting your filter criteria.'}
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {history.map((t) => (
+                    {filteredTrades.map((t) => (
                       <Card key={t.id} className="border-l-4 border-l-primary">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
@@ -551,12 +736,19 @@ export default function TradingChecklistApp() {
                               <Badge variant={t.verdict === "A+" ? "default" : "secondary"}>
                                 {t.verdict}
                               </Badge>
+                              {t.pair && <Badge variant="outline">{t.pair}</Badge>}
+                              {t.session && <Badge variant="outline">{t.session}</Badge>}
                             </div>
                             <span className="text-sm text-muted-foreground">{t.timestamp}</span>
                           </div>
                           <div className="text-sm space-y-1">
                             <p><strong>Score:</strong> {t.score}/{t.possible} ({Math.round((t.score/t.possible)*100)}%)</p>
-                                                         {t.notes && <p className="italic text-muted-foreground">&ldquo;{t.notes}&rdquo;</p>}
+                            {t.pnl !== undefined && (
+                              <p><strong>P&L:</strong> <span className={t.pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                ${t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(2)}
+                              </span></p>
+                            )}
+                            {t.notes && <p className="italic text-muted-foreground">&ldquo;{t.notes}&rdquo;</p>}
                           </div>
                         </CardContent>
                       </Card>
@@ -721,6 +913,41 @@ export default function TradingChecklistApp() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Strategy History Modal */}
+        <StrategyHistoryModal
+          open={openHistory}
+          onOpenChange={setOpenHistory}
+          strategyId={activeId}
+          strategyName={activeStrategy.name}
+          onRestore={(strategyData) => {
+            // Update the strategy with restored data
+            const updated = strategies.map((s) =>
+              s.id === activeId ? { ...s, ...strategyData } : s
+            );
+            setStrategies(updated);
+            // Clear checked conditions that no longer exist
+            const newConditionIds = strategyData.conditions.map(c => c.id);
+            setCheckedIds(prev => prev.filter(id => newConditionIds.includes(id)));
+          }}
+        />
+
+        {/* Strategy Sharing Modal */}
+        <StrategySharingComponent
+          open={openSharing}
+          onOpenChange={setOpenSharing}
+          strategy={activeStrategy}
+          onImportStrategy={(importedStrategy) => {
+            setStrategies([...strategies, importedStrategy]);
+            setActiveId(importedStrategy.id);
+          }}
+        />
+
+        {/* Onboarding Tour */}
+        <OnboardingTour
+          isFirstVisit={isFirstVisit}
+          onTourComplete={handleTourComplete}
+        />
       </main>
     </div>
   );
