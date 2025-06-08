@@ -67,7 +67,7 @@ interface TradeFiltersProps {
   filters: TradeFilters
   onFiltersChange: (filters: TradeFilters) => void
   availableTags: TradeTag[]
-  onCreateTag: (tag: Omit<TradeTag, 'id'>) => void
+  onCreateTag?: (tag: Omit<TradeTag, 'id'>) => void
 }
 
 const defaultTags: TradeTag[] = [
@@ -99,16 +99,15 @@ export function TradeFilters({
   trades, 
   filters, 
   onFiltersChange, 
-  availableTags, 
-  onCreateTag 
+  availableTags
 }: TradeFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false)
 
   // Get unique values from trades for filter options
   const uniqueValues = useMemo(() => {
     const strategies = [...new Set(trades.map(t => t.strategyName))]
-    const pairs = [...new Set(trades.map(t => t.pair).filter(Boolean))]
-    const sessions = [...new Set(trades.map(t => t.session).filter(Boolean))]
+    const pairs = [...new Set(trades.map(t => t.pair).filter(Boolean))] as string[]
+    const sessions = [...new Set(trades.map(t => t.session).filter(Boolean))] as string[]
     
     return { strategies, pairs, sessions }
   }, [trades])

@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { 
   History, 
@@ -17,6 +17,12 @@ import {
   GitBranch
 } from "lucide-react"
 import { StrategyVersionManager, StrategyRevision } from "@/lib/strategy-versioning"
+
+interface Condition {
+  id: number
+  text: string
+  importance: 'high' | 'medium' | 'low'
+}
 
 interface StrategyHistoryModalProps {
   open: boolean
@@ -276,17 +282,17 @@ export function StrategyHistoryModal({
                               <div className="space-y-1">
                                 {change.oldValue && (
                                   <div className="text-sm text-red-600 line-through">
-                                    {(change.oldValue as any).text} 
-                                    <Badge variant="outline" className={`ml-2 text-xs ${getImportanceColor((change.oldValue as any).importance)}`}>
-                                      {(change.oldValue as any).importance}
+                                    {(change.oldValue as Condition).text} 
+                                    <Badge variant="outline" className={`ml-2 text-xs ${getImportanceColor((change.oldValue as Condition).importance)}`}>
+                                      {(change.oldValue as Condition).importance}
                                     </Badge>
                                   </div>
                                 )}
                                 {change.newValue && (
                                   <div className="text-sm text-green-600">
-                                    {(change.newValue as any).text}
-                                    <Badge variant="outline" className={`ml-2 text-xs ${getImportanceColor((change.newValue as any).importance)}`}>
-                                      {(change.newValue as any).importance}
+                                    {(change.newValue as Condition).text}
+                                    <Badge variant="outline" className={`ml-2 text-xs ${getImportanceColor((change.newValue as Condition).importance)}`}>
+                                      {(change.newValue as Condition).importance}
                                     </Badge>
                                   </div>
                                 )}
@@ -310,7 +316,7 @@ export function StrategyHistoryModal({
                           <CardTitle className="text-lg">Conditions ({selectedRevision.data.conditions.length})</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                          {selectedRevision.data.conditions.map((condition, index) => (
+                          {selectedRevision.data.conditions.map((condition) => (
                             <div key={condition.id} className="flex items-center space-x-3 p-3 rounded-lg border">
                               <span className="text-sm font-medium">{condition.text}</span>
                               <Badge variant="outline" className={`text-xs ${getImportanceColor(condition.importance)}`}>

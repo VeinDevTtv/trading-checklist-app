@@ -22,6 +22,7 @@ interface TradeDay {
     strategyName: string
     score: number
     possible: number
+    outcome?: 'win' | 'loss' | 'breakeven'
   }>
   totalPnl: number
   aPlusCount: number

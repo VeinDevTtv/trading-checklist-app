@@ -181,7 +181,7 @@ export class StrategySharing {
       }
 
       return { success: true, strategy };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: 'Failed to decode shared strategy. URL may be corrupted.'
@@ -196,7 +196,7 @@ export class StrategySharing {
     try {
       await navigator.clipboard.writeText(shareUrl);
       return true;
-    } catch (error) {
+    } catch {
       // Fallback for older browsers
       try {
         const textArea = document.createElement('textarea');
@@ -218,20 +218,22 @@ export class StrategySharing {
   /**
    * Validate strategy data structure
    */
-  private static validateStrategyData(data: any): { valid: boolean; error?: string } {
+  private static validateStrategyData(data: unknown): { valid: boolean; error?: string } {
     if (!data || typeof data !== 'object') {
       return { valid: false, error: 'Invalid strategy data format' };
     }
 
-    if (!data.name || typeof data.name !== 'string') {
+    const strategy = data as Record<string, unknown>;
+
+    if (!strategy.name || typeof strategy.name !== 'string') {
       return { valid: false, error: 'Strategy name is required' };
     }
 
-    if (!Array.isArray(data.conditions) || data.conditions.length === 0) {
+    if (!Array.isArray(strategy.conditions) || strategy.conditions.length === 0) {
       return { valid: false, error: 'Strategy must have at least one condition' };
     }
 
-    for (const condition of data.conditions) {
+    for (const condition of strategy.conditions) {
       if (!condition.text || typeof condition.text !== 'string') {
         return { valid: false, error: 'All conditions must have text' };
       }

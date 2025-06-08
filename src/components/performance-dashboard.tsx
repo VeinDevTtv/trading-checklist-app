@@ -53,8 +53,6 @@ interface PerformanceDashboardProps {
   initialBalance?: number
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
 export function PerformanceDashboard({ trades, initialBalance = 10000 }: PerformanceDashboardProps) {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null)
   const [loading, setLoading] = useState(false)
@@ -389,7 +387,7 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {strategyPerformance.map((strategy, index) => (
+                {strategyPerformance.map((strategy) => (
                   <div key={strategy.strategyName} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-semibold">{strategy.strategyName}</h4>

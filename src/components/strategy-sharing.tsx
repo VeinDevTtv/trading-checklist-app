@@ -129,7 +129,7 @@ export function StrategySharingComponent({
       } else {
         setImportError(result.error || 'Failed to import strategy')
       }
-    } catch (error) {
+    } catch {
       setImportError('Failed to process file')
     } finally {
       setImporting(false)
@@ -159,7 +159,7 @@ export function StrategySharingComponent({
       } else {
         setImportError(result.error || 'No shared strategy found in URL')
       }
-    } catch (error) {
+    } catch {
       setImportError('Failed to import from URL')
     }
   }

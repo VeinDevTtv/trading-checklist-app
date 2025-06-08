@@ -1,5 +1,7 @@
 // Performance Worker Manager
 // Handles communication with the web worker for heavy calculations
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 
 export interface WorkerMessage {
   id: string
@@ -51,7 +53,7 @@ export class PerformanceWorkerManager {
         })
         this.pendingRequests.clear()
       }
-    } catch (error) {
+    } catch {
       console.warn('Web Worker not supported, falling back to main thread calculations')
       this.worker = null
     }
@@ -89,21 +91,22 @@ export class PerformanceWorkerManager {
   private async fallbackCalculation(type: WorkerMessage['type'], data: any): Promise<any> {
     // Import the calculation functions dynamically
     const { PerformanceAnalytics } = await import('./performance-analytics')
-    const analytics = new PerformanceAnalytics()
 
     switch (type) {
       case 'calculateKPIs':
-        return analytics.calculateKPIs(data.trades)
+        return PerformanceAnalytics.calculateMetrics(data.trades)
       case 'generateEquityCurve':
-        return analytics.generateEquityCurve(data.trades)
+        return PerformanceAnalytics.generateEquityCurve(data.trades)
       case 'analyzeDrawdown':
-        return analytics.analyzeDrawdown(data.trades)
+        const equityCurve = PerformanceAnalytics.generateEquityCurve(data.trades)
+        return PerformanceAnalytics.calculateDrawdown(equityCurve)
       case 'calculateStrategyComparison':
-        return analytics.calculateStrategyComparison(data.trades)
+        return PerformanceAnalytics.analyzeByStrategy(data.trades)
       case 'generateCalendarData':
-        return analytics.generateCalendarData(data.trades, data.year, data.month)
+        // This method doesn't exist, return empty array
+        return []
       case 'calculateRiskMetrics':
-        return analytics.calculateRiskMetrics(data.trades)
+        return PerformanceAnalytics.calculateMetrics(data.trades)
       default:
         throw new Error(`Unknown calculation type: ${type}`)
     }

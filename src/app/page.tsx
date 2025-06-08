@@ -37,8 +37,7 @@ import {
   Download,
   Star,
   Filter,
-  Calendar,
-  RotateCcw
+  Calendar
 } from "lucide-react";
 import jsPDF from "jspdf";
 
@@ -181,7 +180,6 @@ export default function TradingChecklistApp() {
 
   // onboarding state
   const [isFirstVisit, setIsFirstVisit] = useState(false);
-  const [showTour, setShowTour] = useState(false);
 
   // filtering state
   const [showFilters, setShowFilters] = useState(false);
@@ -203,8 +201,6 @@ export default function TradingChecklistApp() {
 
   // calendar state
   const [showCalendar, setShowCalendar] = useState(false);
-  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
-  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
 
   // Filtered trades
   const filteredTrades = useTradeFilters(history as EnhancedTradeLog[], tradeFilters);
@@ -454,7 +450,6 @@ export default function TradingChecklistApp() {
   // Onboarding handlers
   const handleTourComplete = () => {
     setIsFirstVisit(false);
-    setShowTour(false);
   };
 
   // Tag management
@@ -707,8 +702,8 @@ export default function TradingChecklistApp() {
             {showCalendar && (
               <CalendarHeatmap
                 trades={history as EnhancedTradeLog[]}
-                year={calendarYear}
-                month={calendarMonth}
+                year={new Date().getFullYear()}
+                month={new Date().getMonth()}
               />
             )}
 
