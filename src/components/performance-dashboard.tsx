@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -73,7 +73,7 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
     }))
   }, [trades])
 
-  const calculateMetrics = async () => {
+  const calculateMetrics = useCallback(async () => {
     setLoading(true)
     try {
       const calculatedMetrics = PerformanceAnalytics.calculateMetrics(tradeResults, initialBalance)
@@ -84,7 +84,7 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
     } finally {
       setLoading(false)
     }
-  }
+  }, [tradeResults, initialBalance])
 
   useEffect(() => {
     // Try to load cached metrics first
@@ -94,7 +94,7 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
     } else {
       calculateMetrics()
     }
-  }, [tradeResults, initialBalance])
+  }, [calculateMetrics])
 
   const equityCurve = useMemo(() => {
     if (tradeResults.length === 0) return []

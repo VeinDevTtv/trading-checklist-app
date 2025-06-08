@@ -196,6 +196,9 @@ export default function TradingChecklistApp() {
   // onboarding state
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
+  // refresh trigger for components
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   // filtering state
   const [showFilters, setShowFilters] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -541,8 +544,15 @@ export default function TradingChecklistApp() {
 
     setHistory(updatedHistory);
     saveToStorage(STORAGE_KEYS.HISTORY, updatedHistory);
+    
+    // Force refresh of all components that depend on trade data
+    setRefreshTrigger(prev => prev + 1);
+    
     setOpenTradeEdit(false);
     setEditingTrade(null);
+    
+    // Show success feedback (you could implement a toast notification here)
+    console.log('Trade updated successfully!');
   };
 
   const deleteTrade = (tradeId: number) => {
@@ -550,6 +560,9 @@ export default function TradingChecklistApp() {
       const updatedHistory = history.filter(trade => trade.id !== tradeId);
       setHistory(updatedHistory);
       saveToStorage(STORAGE_KEYS.HISTORY, updatedHistory);
+      
+      // Force refresh of all components that depend on trade data
+      setRefreshTrigger(prev => prev + 1);
     }
   };
 
@@ -768,7 +781,7 @@ export default function TradingChecklistApp() {
 
           {/* Performance Dashboard Tab */}
           <TabsContent value="performance">
-            <PerformanceDashboard trades={history} />
+            <PerformanceDashboard trades={history} key={refreshTrigger} />
           </TabsContent>
 
           {/* Trade History Tab */}
@@ -822,6 +835,7 @@ export default function TradingChecklistApp() {
                 trades={history as EnhancedTradeLog[]}
                 year={new Date().getFullYear()}
                 month={new Date().getMonth()}
+                key={refreshTrigger}
               />
             )}
 
@@ -841,7 +855,9 @@ export default function TradingChecklistApp() {
                 ) : (
                   <div className="space-y-4">
                     {filteredTrades.map((t) => (
-                      <Card key={t.id} className="border-l-4 border-l-primary">
+                      <Card key={t.id} className={`border-l-4 ${
+                        t.pnl !== undefined ? 'border-l-green-500' : 'border-l-yellow-500'
+                      }`}>
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
@@ -849,6 +865,11 @@ export default function TradingChecklistApp() {
                               <Badge variant={t.verdict === "A+" ? "default" : "secondary"}>
                                 {t.verdict}
                               </Badge>
+                              {t.pnl === undefined && (
+                                <Badge variant="outline" className="text-yellow-600 border-yellow-500">
+                                  Pending Update
+                                </Badge>
+                              )}
                               {t.pair && <Badge variant="outline">{t.pair}</Badge>}
                               {t.session && <Badge variant="outline">{t.session}</Badge>}
                               {t.outcome && (
