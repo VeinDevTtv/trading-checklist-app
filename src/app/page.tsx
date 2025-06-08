@@ -484,24 +484,24 @@ export default function TradingChecklistApp() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="checklist" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="checklist" className="flex items-center gap-2">
+          <TabsList className="w-full sm:grid sm:grid-cols-5 flex gap-2 px-2 py-1 rounded-xl bg-muted/50 overflow-x-auto scrollbar-hide">
+            <TabsTrigger value="checklist" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
               <CheckCircle className="h-4 w-4" />
               Checklist
             </TabsTrigger>
-            <TabsTrigger value="calculator" className="flex items-center gap-2">
+            <TabsTrigger value="calculator" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
               <Calculator className="h-4 w-4" />
               Risk Calculator
             </TabsTrigger>
-            <TabsTrigger value="performance" className="flex items-center gap-2" data-tour="performance-tab">
+            <TabsTrigger value="performance" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap" data-tour="performance-tab">
               <TrendingUp className="h-4 w-4" />
               Performance
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
+            <TabsTrigger value="history" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
               <History className="h-4 w-4" />
               Trade History
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
+            <TabsTrigger value="settings" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
               <SettingsIcon className="h-4 w-4" />
               Settings
             </TabsTrigger>
