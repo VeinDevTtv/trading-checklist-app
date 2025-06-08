@@ -432,6 +432,37 @@ export default function TradingChecklistApp() {
     setCheckedIds(prev => prev.filter(id => newConditionIds.includes(id)));
   };
 
+  // Delete strategy function
+  const deleteStrategy = (strategyId: string) => {
+    // Prevent deletion if it's the only strategy
+    if (strategies.length <= 1) {
+      alert("Cannot delete the last strategy. You must have at least one strategy.");
+      return;
+    }
+
+    const strategyToDelete = strategies.find(s => s.id === strategyId);
+    if (!strategyToDelete) return;
+
+    // Check if there are trades using this strategy
+    const relatedTrades = history.filter(trade => trade.strategyName === strategyToDelete.name);
+    const tradeWarning = relatedTrades.length > 0 
+      ? `\n\nNote: ${relatedTrades.length} trade(s) in your history use this strategy. The trades will remain but will show as using a deleted strategy.`
+      : "";
+
+    if (confirm(`Are you sure you want to delete the strategy "${strategyToDelete.name}"? This cannot be undone.${tradeWarning}`)) {
+      // Remove the strategy
+      const updatedStrategies = strategies.filter(s => s.id !== strategyId);
+      setStrategies(updatedStrategies);
+
+      // If the deleted strategy was active, switch to the first remaining strategy
+      if (activeId === strategyId) {
+        setActiveId(updatedStrategies[0].id);
+        setCheckedIds([]); // Clear checked conditions
+        setNotes(""); // Clear notes
+      }
+    }
+  };
+
   // Clear all data function (for debugging/reset purposes)
   const clearAllData = () => {
     if (confirm("Are you sure you want to clear all saved data? This cannot be undone.")) {
@@ -538,6 +569,16 @@ export default function TradingChecklistApp() {
                   <Button variant="outline" onClick={startEdit} className="flex items-center gap-2">
                     <Edit className="h-4 w-4" />
                     Edit Strategy
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => deleteStrategy(activeId)} 
+                    className="flex items-center gap-2"
+                    disabled={strategies.length <= 1}
+                    title={strategies.length <= 1 ? "Cannot delete the last strategy" : `Delete "${activeStrategy.name}"`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete Strategy
                   </Button>
                   <Button variant="outline" onClick={() => setOpenHistory(true)} className="flex items-center gap-2">
                     <History className="h-4 w-4" />
