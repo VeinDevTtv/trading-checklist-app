@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -44,13 +44,7 @@ export function StrategyHistoryModal({
   const [compareRevision, setCompareRevision] = useState<StrategyRevision | null>(null)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (open && strategyId) {
-      loadRevisions()
-    }
-  }, [open, strategyId])
-
-  const loadRevisions = async () => {
+  const loadRevisions = useCallback(async () => {
     setLoading(true)
     try {
       const history = await StrategyVersionManager.getRevisionHistory(strategyId)
@@ -63,7 +57,13 @@ export function StrategyHistoryModal({
     } finally {
       setLoading(false)
     }
-  }
+  }, [strategyId])
+
+  useEffect(() => {
+    if (open && strategyId) {
+      loadRevisions()
+    }
+  }, [open, strategyId, loadRevisions])
 
   const handleRestore = async (revision: StrategyRevision) => {
     if (confirm(`Are you sure you want to restore "${strategyName}" to this revision from ${new Date(revision.timestamp).toLocaleString()}?`)) {

@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator"
 import { 
   Users, 
   MessageCircle, 
-  Share2, 
   Copy, 
   Check, 
   X, 

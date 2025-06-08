@@ -9,9 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { 
   Mic, 
-  MicOff, 
   Video, 
-  VideoOff, 
   Play, 
   Pause, 
   Square, 
@@ -79,7 +77,7 @@ export function VoiceVideoNotes({
       mediaRecorderRef.current = mediaRecorder
       chunksRef.current = []
 
-      mediaRecorder.ondataavailable = (event) => {
+      mediaRecorder.ondataavailable = (event: BlobEvent) => {
         if (event.data.size > 0) {
           chunksRef.current.push(event.data)
         }
@@ -165,7 +163,7 @@ export function VoiceVideoNotes({
       const audio = new Audio(audioUrl)
       
       if (recognitionRef.current) {
-        recognitionRef.current.onresult = (event) => {
+        recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
           let transcript = ''
           for (let i = 0; i < event.results.length; i++) {
             transcript += event.results[i][0].transcript + ' '
@@ -414,9 +412,40 @@ export function VoiceVideoNotes({
 }
 
 // Type declarations for Web Speech API
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
+}
+
+interface SpeechRecognitionResultList {
+  length: number
+  item(index: number): SpeechRecognitionResult
+  [index: number]: SpeechRecognitionResult
+}
+
+interface SpeechRecognitionResult {
+  length: number
+  item(index: number): SpeechRecognitionAlternative
+  [index: number]: SpeechRecognitionAlternative
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string
+  confidence: number
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  start(): void
+  stop(): void
+  onresult: ((event: SpeechRecognitionEvent) => void) | null
+  onerror: ((event: Event) => void) | null
+}
+
 declare global {
   interface Window {
-    webkitSpeechRecognition: any
-    SpeechRecognition: any
+    webkitSpeechRecognition: new () => SpeechRecognition
+    SpeechRecognition: new () => SpeechRecognition
   }
 } 

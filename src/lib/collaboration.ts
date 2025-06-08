@@ -55,15 +55,14 @@ export class CollaborationProvider {
       try {
         // Create WebRTC provider
         this.provider = new WebrtcProvider(this.roomId, this.doc, {
-          signaling: ['wss://signaling.yjs.dev'],
-          password: null,
-          awareness: {
-            user: {
-              id: this.userId,
-              name: this.userName,
-              color: this.userColor
-            }
-          }
+          signaling: ['wss://signaling.yjs.dev']
+        })
+
+        // Set user awareness
+        this.provider.awareness.setLocalStateField('user', {
+          id: this.userId,
+          name: this.userName,
+          color: this.userColor
         })
 
         // Add current user to users map
@@ -75,8 +74,8 @@ export class CollaborationProvider {
         })
 
         // Listen for connection events
-        this.provider.on('status', (event: { status: string }) => {
-          if (event.status === 'connected') {
+        this.provider.on('status', (event: { connected: boolean }) => {
+          if (event.connected) {
             resolve()
           }
         })

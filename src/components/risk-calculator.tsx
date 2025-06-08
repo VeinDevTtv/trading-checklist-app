@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,11 +32,7 @@ export function RiskCalculator() {
     riskRewardRatio: 0
   })
 
-  useEffect(() => {
-    calculateRisk()
-  }, [accountBalance, riskPercentage, entryPrice, stopLoss, takeProfit, pipValue])
-
-  const calculateRisk = () => {
+  const calculateRisk = useCallback(() => {
     if (!entryPrice || !stopLoss || !accountBalance) {
       setCalculation({
         positionSize: 0,
@@ -64,7 +60,11 @@ export function RiskCalculator() {
       potentialLoss: Math.round(potentialLoss * 100) / 100,
       riskRewardRatio: Math.round(riskRewardRatio * 100) / 100
     })
-  }
+  }, [accountBalance, riskPercentage, entryPrice, stopLoss, takeProfit, pipValue])
+
+  useEffect(() => {
+    calculateRisk()
+  }, [calculateRisk])
 
   const getRiskLevel = () => {
     if (riskPercentage[0] <= 1) return { level: "Conservative", color: "bg-green-500" }
