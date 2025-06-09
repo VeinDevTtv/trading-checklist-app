@@ -83,7 +83,9 @@ const defaultTags: TradeTag[] = [
   { id: 'usdjpy', name: 'USD/JPY', color: '#84CC16', category: 'pair' },
   { id: 'audusd', name: 'AUD/USD', color: '#F97316', category: 'pair' },
   { id: 'usdcad', name: 'USD/CAD', color: '#EC4899', category: 'pair' },
-  
+  { id: 'nas100', name: 'NAS100', color: '#06B6D4', category: 'pair' },
+  { id: 'spx500', name: 'SPX500', color: '#EF4444', category: 'pair' },
+
   // Setups
   { id: 'breakout', name: 'Breakout', color: '#14B8A6', category: 'setup' },
   { id: 'pullback', name: 'Pullback', color: '#A855F7', category: 'setup' },
