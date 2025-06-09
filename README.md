@@ -64,6 +64,14 @@ A comprehensive, professional-grade trading checklist application designed to he
 - **Manual Editing**: Edit transcripts for accuracy and clarity
 - **Fallback Support**: Graceful degradation for browsers without speech recognition
 
+### 🌐 Browser Compatibility for Voice/Video Features
+- **✅ Chrome/Edge**: Full support for voice & video recording with transcription
+- **✅ Firefox**: Good support for recording (transcription limited)
+- **✅ Safari**: Basic recording support (transcription not available)
+- **⚠️ Brave Browser**: Known audio issues - **use Chrome/Firefox instead**
+- **📱 Mobile**: Recording works on modern mobile browsers with proper permissions
+- **🔒 HTTPS Required**: Voice/video features require secure HTTPS connection
+
 ## 🔥 Tag-Based Heat-Maps
 
 ### 🏷️ Intelligent Tagging System
@@ -284,6 +292,8 @@ The application uses a sophisticated scoring system that considers both the numb
 - **Node.js 18+**: Latest LTS version recommended for optimal performance
 - **npm 8+** or **yarn 1.22+**: Package manager for dependency installation
 - **Modern Browser**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ for full feature support
+- **HTTPS Connection**: Required for voice/video recording features (automatic in production)
+- **Microphone/Camera**: Optional hardware for voice/video note features
 
 ### 💻 Local Development
 
@@ -355,10 +365,12 @@ npm start
 
 #### 🎤 Recording Voice Notes
 1. **Start Recording**: Click the microphone icon in the trade analysis section
-2. **Speak Clearly**: Record up to 30 seconds of analysis or market observations
-3. **Auto-Transcription**: Watch real-time transcription appear as you speak
-4. **Review & Edit**: Play back the recording and edit the transcript if needed
-5. **Save & Search**: Notes are automatically saved and become searchable
+2. **Browser Check**: App automatically detects browser compatibility and shows warnings
+3. **Speak Clearly**: Record up to 30 seconds of analysis or market observations
+4. **Auto-Transcription**: Watch real-time transcription appear as you speak (Chrome/Edge only)
+5. **Review & Edit**: Play back the recording and edit the transcript if needed
+6. **Save & Search**: Notes are automatically saved and become searchable
+7. **Troubleshooting**: If recording fails, try Chrome/Firefox for best compatibility
 
 #### 📹 Creating Video Notes
 1. **Enable Camera**: Grant camera and microphone permissions
@@ -616,6 +628,8 @@ This project is open source and available under the [MIT License](LICENSE).
 - **🔌 Broker Integration**: Direct broker API connections for live data and execution
 - **👥 Social Features**: Strategy sharing community and social trading features
 - **📊 Advanced Backtesting**: Historical strategy testing with comprehensive analytics
+- **🎙️ Enhanced Voice Features**: Improved browser compatibility and offline transcription
+- **🔄 Advanced Collaboration**: Screen sharing, whiteboard tools, and session recording
 
 ---
 
