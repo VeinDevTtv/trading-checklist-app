@@ -3,12 +3,13 @@
 import { useState, useMemo, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
 import { 
   Calendar,
   DollarSign,
@@ -20,7 +21,10 @@ import {
   Calculator,
   PiggyBank,
   Zap,
-  Settings
+  Settings,
+  Plus,
+  Save,
+  Trash2
 } from "lucide-react"
 
 interface PropFirmRule {
@@ -32,6 +36,11 @@ interface PropFirmRule {
   maxTradingDays: number
   consistencyRule?: string
   accountSizes: number[] // Available account sizes
+}
+
+interface CustomPropFirm extends PropFirmRule {
+  id: string
+  isCustom: true
 }
 
 interface PayoutPlan {
@@ -61,9 +70,43 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
   const [selectedPropFirm, setSelectedPropFirm] = useState<string>('ftmo')
   const [currentBalance, setCurrentBalance] = useState<number>(initialBalance || 10000)
   const [selectedAccountSize, setSelectedAccountSize] = useState<number>(10000)
+  const [customPropFirms, setCustomPropFirms] = useState<CustomPropFirm[]>([])
+  const [showCustomForm, setShowCustomForm] = useState<boolean>(false)
+  const [editingCustomFirm, setEditingCustomFirm] = useState<string | null>(null)
 
-  // Prop firm rules database with more firms
-  const propFirmRules: Record<string, PropFirmRule> = useMemo(() => ({
+  // Custom firm form state
+  const [customForm, setCustomForm] = useState({
+    name: '',
+    maxDailyLoss: 5,
+    maxTotalLoss: 10,
+    profitTarget: 8,
+    minTradingDays: 5,
+    maxTradingDays: 30,
+    consistencyRule: '',
+    accountSizes: '10000,25000,50000,100000'
+  })
+
+  // Load custom prop firms from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('customPropFirms')
+    if (saved) {
+      try {
+        setCustomPropFirms(JSON.parse(saved))
+      } catch (error) {
+        console.error('Failed to load custom prop firms:', error)
+      }
+    }
+  }, [])
+
+  // Save custom prop firms to localStorage whenever they change
+  useEffect(() => {
+    if (customPropFirms.length > 0) {
+      localStorage.setItem('customPropFirms', JSON.stringify(customPropFirms))
+    }
+  }, [customPropFirms])
+
+  // Built-in prop firm rules database
+  const builtInPropFirmRules: Record<string, PropFirmRule> = useMemo(() => ({
     ftmo: {
       name: 'FTMO',
       maxDailyLoss: 5,
@@ -161,6 +204,102 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
       accountSizes: [25000, 50000, 100000, 200000]
     }
   }), [])
+
+  // Combined prop firm rules (built-in + custom)
+  const propFirmRules = useMemo(() => {
+    const combined: Record<string, PropFirmRule> = { ...builtInPropFirmRules }
+    
+    customPropFirms.forEach(firm => {
+      combined[firm.id] = firm
+    })
+    
+    return combined
+  }, [builtInPropFirmRules, customPropFirms])
+
+  // Handle custom form submission
+  const handleSaveCustomFirm = () => {
+    if (!customForm.name.trim()) return
+
+    const accountSizes = customForm.accountSizes
+      .split(',')
+      .map(size => parseInt(size.trim()))
+      .filter(size => !isNaN(size) && size > 0)
+      .sort((a, b) => a - b)
+
+    if (accountSizes.length === 0) {
+      alert('Please enter at least one valid account size')
+      return
+    }
+
+    const newFirm: CustomPropFirm = {
+      id: editingCustomFirm || `custom_${Date.now()}`,
+      name: customForm.name,
+      maxDailyLoss: customForm.maxDailyLoss,
+      maxTotalLoss: customForm.maxTotalLoss,
+      profitTarget: customForm.profitTarget,
+      minTradingDays: customForm.minTradingDays,
+      maxTradingDays: customForm.maxTradingDays,
+      consistencyRule: customForm.consistencyRule || undefined,
+      accountSizes,
+      isCustom: true
+    }
+
+    if (editingCustomFirm) {
+      // Update existing
+      setCustomPropFirms(prev => prev.map(firm => 
+        firm.id === editingCustomFirm ? newFirm : firm
+      ))
+    } else {
+      // Add new
+      setCustomPropFirms(prev => [...prev, newFirm])
+    }
+
+    // Reset form
+    setCustomForm({
+      name: '',
+      maxDailyLoss: 5,
+      maxTotalLoss: 10,
+      profitTarget: 8,
+      minTradingDays: 5,
+      maxTradingDays: 30,
+      consistencyRule: '',
+      accountSizes: '10000,25000,50000,100000'
+    })
+    setShowCustomForm(false)
+    setEditingCustomFirm(null)
+
+    // Select the new/updated firm
+    setSelectedPropFirm(newFirm.id)
+  }
+
+  // Handle editing custom firm
+  const handleEditCustomFirm = (firmId: string) => {
+    const firm = customPropFirms.find(f => f.id === firmId)
+    if (!firm) return
+
+    setCustomForm({
+      name: firm.name,
+      maxDailyLoss: firm.maxDailyLoss,
+      maxTotalLoss: firm.maxTotalLoss,
+      profitTarget: firm.profitTarget,
+      minTradingDays: firm.minTradingDays,
+      maxTradingDays: firm.maxTradingDays,
+      consistencyRule: firm.consistencyRule || '',
+      accountSizes: firm.accountSizes.join(',')
+    })
+    setEditingCustomFirm(firmId)
+    setShowCustomForm(true)
+  }
+
+  // Handle deleting custom firm
+  const handleDeleteCustomFirm = (firmId: string) => {
+    if (confirm('Are you sure you want to delete this custom prop firm?')) {
+      setCustomPropFirms(prev => prev.filter(firm => firm.id !== firmId))
+      if (selectedPropFirm === firmId) {
+        setSelectedPropFirm('ftmo')
+      }
+    }
+  }
 
   // Update account size when prop firm changes
   useEffect(() => {
@@ -293,57 +432,242 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="prop-firm">Prop Firm</Label>
-              <Select value={selectedPropFirm} onValueChange={setSelectedPropFirm}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(propFirmRules).map(([key, rule]) => (
-                    <SelectItem key={key} value={key}>
-                      {rule.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="prop-firm">Prop Firm</Label>
+                <div className="flex gap-2">
+                  <Select value={selectedPropFirm} onValueChange={setSelectedPropFirm}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="custom-header" disabled className="font-semibold">
+                        Built-in Firms
+                      </SelectItem>
+                      {Object.entries(builtInPropFirmRules).map(([key, rule]) => (
+                        <SelectItem key={key} value={key}>
+                          {rule.name}
+                        </SelectItem>
+                      ))}
+                      {customPropFirms.length > 0 && (
+                        <>
+                          <SelectItem value="custom-firms-header" disabled className="font-semibold">
+                            Custom Firms
+                          </SelectItem>
+                          {customPropFirms.map((firm) => (
+                            <SelectItem key={firm.id} value={firm.id}>
+                              <div className="flex items-center justify-between w-full">
+                                <span>{firm.name}</span>
+                                <div className="flex gap-1 ml-2">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-4 w-4 p-0"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleEditCustomFirm(firm.id)
+                                    }}
+                                  >
+                                    <Settings className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-4 w-4 p-0 text-red-500"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleDeleteCustomFirm(firm.id)
+                                    }}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowCustomForm(true)}
+                    className="px-3"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="account-size">Account Size</Label>
+                <Select 
+                  value={selectedAccountSize.toString()} 
+                  onValueChange={(value) => {
+                    const size = Number(value)
+                    setSelectedAccountSize(size)
+                    setCurrentBalance(size)
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propFirmRules[selectedPropFirm].accountSizes.map((size) => (
+                      <SelectItem key={size} value={size.toString()}>
+                        ${size.toLocaleString()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="current-balance">Current Balance</Label>
+                <Input
+                  id="current-balance"
+                  type="number"
+                  value={currentBalance}
+                  onChange={(e) => setCurrentBalance(Number(e.target.value))}
+                  min={0}
+                  max={selectedAccountSize}
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="account-size">Account Size</Label>
-              <Select 
-                value={selectedAccountSize.toString()} 
-                onValueChange={(value) => {
-                  const size = Number(value)
-                  setSelectedAccountSize(size)
-                  setCurrentBalance(size)
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {propFirmRules[selectedPropFirm].accountSizes.map((size) => (
-                    <SelectItem key={size} value={size.toString()}>
-                      ${size.toLocaleString()}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Custom Prop Firm Form */}
+            {showCustomForm && (
+              <Card className="border-2 border-blue-200 dark:border-blue-800">
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {editingCustomFirm ? 'Edit Custom Prop Firm' : 'Add Custom Prop Firm'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-name">Firm Name</Label>
+                      <Input
+                        id="custom-name"
+                        value={customForm.name}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="e.g., My Prop Firm"
+                      />
+                    </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="current-balance">Current Balance</Label>
-              <Input
-                id="current-balance"
-                type="number"
-                value={currentBalance}
-                onChange={(e) => setCurrentBalance(Number(e.target.value))}
-                min={0}
-                max={selectedAccountSize}
-              />
-            </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-account-sizes">Account Sizes (comma-separated)</Label>
+                      <Input
+                        id="custom-account-sizes"
+                        value={customForm.accountSizes}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, accountSizes: e.target.value }))}
+                        placeholder="10000,25000,50000,100000"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-max-daily-loss">Max Daily Loss (%)</Label>
+                      <Input
+                        id="custom-max-daily-loss"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={customForm.maxDailyLoss}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, maxDailyLoss: Number(e.target.value) }))}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-max-total-loss">Max Total Loss (%)</Label>
+                      <Input
+                        id="custom-max-total-loss"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={customForm.maxTotalLoss}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, maxTotalLoss: Number(e.target.value) }))}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-profit-target">Profit Target (%)</Label>
+                      <Input
+                        id="custom-profit-target"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={customForm.profitTarget}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, profitTarget: Number(e.target.value) }))}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-min-trading-days">Min Trading Days</Label>
+                      <Input
+                        id="custom-min-trading-days"
+                        type="number"
+                        min="1"
+                        value={customForm.minTradingDays}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, minTradingDays: Number(e.target.value) }))}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-max-trading-days">Max Trading Days</Label>
+                      <Input
+                        id="custom-max-trading-days"
+                        type="number"
+                        min="1"
+                        value={customForm.maxTradingDays}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, maxTradingDays: Number(e.target.value) }))}
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="custom-consistency-rule">Consistency Rule (optional)</Label>
+                      <Textarea
+                        id="custom-consistency-rule"
+                        value={customForm.consistencyRule}
+                        onChange={(e) => setCustomForm(prev => ({ ...prev, consistencyRule: e.target.value }))}
+                        placeholder="e.g., No single day > 50% of total profit"
+                        rows={2}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-4">
+                    <Button onClick={handleSaveCustomFirm} className="flex items-center gap-2">
+                      <Save className="h-4 w-4" />
+                      {editingCustomFirm ? 'Update' : 'Save'} Custom Firm
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowCustomForm(false)
+                        setEditingCustomFirm(null)
+                        setCustomForm({
+                          name: '',
+                          maxDailyLoss: 5,
+                          maxTotalLoss: 10,
+                          profitTarget: 8,
+                          minTradingDays: 5,
+                          maxTradingDays: 30,
+                          consistencyRule: '',
+                          accountSizes: '10000,25000,50000,100000'
+                        })
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </CardContent>
       </Card>
