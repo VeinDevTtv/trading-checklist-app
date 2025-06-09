@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { 
@@ -181,6 +181,9 @@ export function StrategySharingComponent({
             <Share2 className="h-5 w-5" />
             Share Strategy: {strategy.name}
           </DialogTitle>
+          <DialogDescription>
+            Export your strategy as JSON or share via URL for others to import.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

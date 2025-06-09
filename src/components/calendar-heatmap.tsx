@@ -187,7 +187,7 @@ export function CalendarHeatmap({ trades, year, month }: CalendarHeatmapProps) {
             <div className="flex gap-2">
               <Badge variant="outline" className="flex items-center gap-1">
                 <Target className="h-3 w-3" />
-                {monthlyStats.aPlusRatio.toFixed(1)}% A+
+                {(monthlyStats.aPlusRatio || 0).toFixed(1)}% A+
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
                 <BarChart3 className="h-3 w-3" />
@@ -205,7 +205,7 @@ export function CalendarHeatmap({ trades, year, month }: CalendarHeatmapProps) {
                   ) : (
                     <TrendingDown className="h-3 w-3" />
                   )}
-                  ${Math.abs(monthlyStats.totalPnl).toFixed(2)}
+                  ${Math.abs(monthlyStats.totalPnl || 0).toFixed(2)}
                 </Badge>
               )}
             </div>
@@ -281,7 +281,7 @@ export function CalendarHeatmap({ trades, year, month }: CalendarHeatmapProps) {
                             </div>
                             <div className="flex justify-between">
                               <span>Avg Score:</span>
-                              <span className="font-medium">{dayData.avgScore.toFixed(1)}%</span>
+                              <span className="font-medium">{(dayData.avgScore || 0).toFixed(1)}%</span>
                             </div>
                             {dayData.totalPnl !== 0 && (
                               <div className="flex justify-between">
@@ -289,14 +289,14 @@ export function CalendarHeatmap({ trades, year, month }: CalendarHeatmapProps) {
                                 <span className={`font-medium ${
                                   dayData.totalPnl > 0 ? 'text-green-600' : 'text-red-600'
                                 }`}>
-                                  ${dayData.totalPnl > 0 ? '+' : ''}${dayData.totalPnl.toFixed(2)}
+                                  ${(dayData.totalPnl || 0) > 0 ? '+' : ''}${(dayData.totalPnl || 0).toFixed(2)}
                                 </span>
                               </div>
                             )}
                             {dayData.winRate > 0 && (
                               <div className="flex justify-between">
                                 <span>Win Rate:</span>
-                                <span className="font-medium">{dayData.winRate.toFixed(0)}%</span>
+                                <span className="font-medium">{(dayData.winRate || 0).toFixed(0)}%</span>
                               </div>
                             )}
                           </div>
@@ -353,11 +353,11 @@ export function CalendarHeatmap({ trades, year, month }: CalendarHeatmapProps) {
                 <div className="text-sm text-muted-foreground">Trading Days</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{monthlyStats.aPlusRatio.toFixed(1)}%</div>
+                <div className="text-2xl font-bold">{(monthlyStats.aPlusRatio || 0).toFixed(1)}%</div>
                 <div className="text-sm text-muted-foreground">A+ Rate</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{monthlyStats.avgTradesPerDay.toFixed(1)}</div>
+                <div className="text-2xl font-bold">{(monthlyStats.avgTradesPerDay || 0).toFixed(1)}</div>
                 <div className="text-sm text-muted-foreground">Avg/Day</div>
               </div>
             </div>

@@ -219,7 +219,7 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
               <div>
                 <p className="text-sm text-muted-foreground">Profit Factor</p>
                 <p className="text-2xl font-bold">
-                  {metrics.profitFactor === Infinity ? '∞' : metrics.profitFactor.toFixed(2)}
+                  {metrics.profitFactor === Infinity ? '∞' : (metrics.profitFactor || 0).toFixed(2)}
                 </p>
               </div>
               <Award className="h-8 w-8 text-purple-600" />
@@ -403,7 +403,7 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
                       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                         <span>{strategy.trades} trades</span>
                         <span>Win Rate: {formatPercentage(strategy.winRate)}</span>
-                        <span>Avg Score: {strategy.averageScore.toFixed(1)}%</span>
+                        <span>Avg Score: {(strategy.averageScore || 0).toFixed(1)}%</span>
                         <span>A+ Rate: {formatPercentage(strategy.aPlusRate)}</span>
                       </div>
                     </div>
@@ -461,15 +461,15 @@ export function PerformanceDashboard({ trades, initialBalance = 10000 }: Perform
                 </div>
                 <div className="flex justify-between">
                   <span>Sharpe Ratio:</span>
-                  <span>{metrics.sharpeRatio.toFixed(3)}</span>
+                                      <span>{(metrics.sharpeRatio || 0).toFixed(3)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Calmar Ratio:</span>
-                  <span>{metrics.calmarRatio.toFixed(3)}</span>
+                                      <span>{(metrics.calmarRatio || 0).toFixed(3)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Avg R:R:</span>
-                  <span>{metrics.averageRiskReward.toFixed(2)}</span>
+                                      <span>{(metrics.averageRiskReward || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>

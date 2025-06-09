@@ -216,12 +216,12 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                     <div className="text-xs space-y-1">
                       <div className="flex justify-between">
                         <span>Win Rate:</span>
-                        <span className="font-medium">{stat.winRate.toFixed(1)}%</span>
+                        <span className="font-medium">{(stat.winRate || 0).toFixed(1)}%</span>
                       </div>
                       <div className="flex justify-between">
                         <span>P&L:</span>
                         <span className={`font-medium ${stat.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          ${stat.totalPnL >= 0 ? '+' : ''}{stat.totalPnL.toFixed(0)}
+                          ${(stat.totalPnL || 0) >= 0 ? '+' : ''}{(stat.totalPnL || 0).toFixed(0)}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -264,7 +264,7 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                   <Target className="h-4 w-4 text-blue-600" />
                   <span className="text-sm font-medium">Win Rate</span>
                 </div>
-                <div className="text-2xl font-bold">{selectedTagStats.winRate.toFixed(1)}%</div>
+                <div className="text-2xl font-bold">{(selectedTagStats.winRate || 0).toFixed(1)}%</div>
                 <Progress value={selectedTagStats.winRate} className="mt-2" />
               </Card>
 
@@ -274,7 +274,7 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                   <span className="text-sm font-medium">Total P&L</span>
                 </div>
                 <div className={`text-2xl font-bold ${selectedTagStats.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${selectedTagStats.totalPnL >= 0 ? '+' : ''}{selectedTagStats.totalPnL.toFixed(2)}
+                  ${(selectedTagStats.totalPnL || 0) >= 0 ? '+' : ''}{(selectedTagStats.totalPnL || 0).toFixed(2)}
                 </div>
               </Card>
 
@@ -284,7 +284,7 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                   <span className="text-sm font-medium">Avg P&L</span>
                 </div>
                 <div className={`text-2xl font-bold ${selectedTagStats.avgPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${selectedTagStats.avgPnL >= 0 ? '+' : ''}{selectedTagStats.avgPnL.toFixed(2)}
+                  ${(selectedTagStats.avgPnL || 0) >= 0 ? '+' : ''}{(selectedTagStats.avgPnL || 0).toFixed(2)}
                 </div>
               </Card>
 
@@ -293,7 +293,7 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                   <TrendingUp className="h-4 w-4 text-orange-600" />
                   <span className="text-sm font-medium">Avg Score</span>
                 </div>
-                <div className="text-2xl font-bold">{selectedTagStats.avgScore.toFixed(1)}%</div>
+                <div className="text-2xl font-bold">{(selectedTagStats.avgScore || 0).toFixed(1)}%</div>
                 <Progress value={selectedTagStats.avgScore} className="mt-2" />
               </Card>
             </div>
@@ -306,7 +306,7 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                   <span className="text-sm font-medium">Best Trade</span>
                 </div>
                 <div className="text-xl font-bold text-green-600">
-                  +${selectedTagStats.bestTrade.toFixed(2)}
+                  +${(selectedTagStats.bestTrade || 0).toFixed(2)}
                 </div>
               </Card>
 
@@ -316,7 +316,7 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                   <span className="text-sm font-medium">Worst Trade</span>
                 </div>
                 <div className="text-xl font-bold text-red-600">
-                  ${selectedTagStats.worstTrade.toFixed(2)}
+                  ${(selectedTagStats.worstTrade || 0).toFixed(2)}
                 </div>
               </Card>
             </div>
@@ -340,7 +340,7 @@ export function TagHeatmap({ trades }: TagHeatmapProps) {
                         label={{ value: 'Cumulative P&L ($)', angle: -90, position: 'insideLeft' }}
                       />
                       <Tooltip 
-                        formatter={(value: number) => [`$${value.toFixed(2)}`, 'Equity']}
+                        formatter={(value: number) => [`$${(value || 0).toFixed(2)}`, 'Equity']}
                         labelFormatter={(label) => `Trade #${label}`}
                       />
                       <Line 

@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { 
   Upload, 
@@ -351,6 +351,9 @@ export function ImageAttachment({
                 </Button>
               </div>
             </DialogTitle>
+            <DialogDescription>
+              Preview and manage your trade screenshot or chart image.
+            </DialogDescription>
           </DialogHeader>
           
           {selectedImage && (

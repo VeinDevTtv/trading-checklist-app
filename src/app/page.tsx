@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -950,12 +950,12 @@ export default function TradingChecklistApp() {
                           </div>
                           <div className="text-sm space-y-1">
                             <p><strong>Score:</strong> {t.score}/{t.possible} ({Math.round((t.score/t.possible)*100)}%)</p>
-                            {t.pnl !== undefined && (
+                            {t.pnl !== undefined && t.pnl !== null && (
                               <p><strong>P&L:</strong> <span className={t.pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
                                 ${t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(2)}
                               </span></p>
                             )}
-                            {t.riskRewardRatio && (
+                            {t.riskRewardRatio && t.riskRewardRatio !== null && (
                               <p><strong>Risk:Reward:</strong> 1:{t.riskRewardRatio.toFixed(2)}</p>
                             )}
                             {t.setup && <p><strong>Setup:</strong> {t.setup}</p>}
@@ -991,6 +991,9 @@ export default function TradingChecklistApp() {
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Strategy</DialogTitle>
+              <DialogDescription>
+                Create a custom trading strategy with weighted conditions to guide your trading decisions.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-6">
               <div className="space-y-2">
@@ -1066,6 +1069,9 @@ export default function TradingChecklistApp() {
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Strategy</DialogTitle>
+              <DialogDescription>
+                Modify your trading strategy conditions and their importance weights.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-6">
               <div className="space-y-2">

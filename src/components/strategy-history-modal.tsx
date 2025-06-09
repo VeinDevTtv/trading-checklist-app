@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -125,6 +125,9 @@ export function StrategyHistoryModal({
             <History className="h-5 w-5" />
             Strategy History: {strategyName}
           </DialogTitle>
+          <DialogDescription>
+            View and restore previous versions of your trading strategy.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex gap-4 h-[70vh]">
