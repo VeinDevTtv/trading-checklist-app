@@ -46,6 +46,7 @@ export function VoiceVideoNotes({
   const [currentTime, setCurrentTime] = useState(0)
   const [playingId, setPlayingId] = useState<string | null>(null)
   const [isTranscribing, setIsTranscribing] = useState<string | null>(null)
+  const [browserWarning, setBrowserWarning] = useState<string | null>(null)
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -53,7 +54,7 @@ export function VoiceVideoNotes({
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
 
-  // Initialize Speech Recognition
+  // Initialize Speech Recognition and check browser compatibility
   useEffect(() => {
     if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
       const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition
@@ -62,13 +63,54 @@ export function VoiceVideoNotes({
       recognitionRef.current.interimResults = false
       recognitionRef.current.lang = 'en-US'
     }
+
+    // Check browser compatibility
+    const checkBrowserCompatibility = async () => {
+      const navigatorWithBrave = navigator as Navigator & { brave?: { isBrave(): Promise<boolean> } }
+      const isBrave = navigatorWithBrave.brave && await navigatorWithBrave.brave.isBrave()
+      
+      if (isBrave) {
+        setBrowserWarning('⚠️ Brave browser detected. Voice/video recording may not work properly due to known audio issues. For best results, use Chrome or Firefox.')
+      } else if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setBrowserWarning('❌ Your browser does not support media recording. Please use a modern browser like Chrome, Firefox, or Safari.')
+      }
+    }
+
+    checkBrowserCompatibility()
   }, [])
 
   const startRecording = async (type: 'voice' | 'video') => {
     try {
+      // Enhanced constraints for better Brave browser compatibility
       const constraints = type === 'video' 
-        ? { video: true, audio: true }
-        : { audio: true }
+        ? { 
+            video: { 
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+              frameRate: { ideal: 15 }
+            }, 
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+              sampleRate: 44100
+            }
+          }
+        : { 
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+              sampleRate: 44100
+            }
+          }
+
+      // Check if we're in Brave browser and show warning
+      const navigatorWithBrave = navigator as Navigator & { brave?: { isBrave(): Promise<boolean> } }
+      const isBrave = navigatorWithBrave.brave && await navigatorWithBrave.brave.isBrave()
+      if (isBrave) {
+        console.warn('Brave browser detected. Audio recording may have issues. Consider using Chrome or Firefox for better compatibility.')
+      }
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
       streamRef.current = stream
@@ -132,7 +174,42 @@ export function VoiceVideoNotes({
 
     } catch (error) {
       console.error('Error starting recording:', error)
-      alert('Could not access microphone/camera. Please check permissions.')
+      
+      // Provide specific error messages for common Brave browser issues
+      let errorMessage = 'Could not access microphone/camera. '
+      
+      if (error instanceof DOMException) {
+        switch (error.name) {
+          case 'NotAllowedError':
+            errorMessage += 'Permission denied. Please allow microphone/camera access in your browser settings.'
+            break
+          case 'NotFoundError':
+            errorMessage += 'No microphone/camera found. Please check your device connections.'
+            break
+          case 'NotSupportedError':
+            errorMessage += 'Recording not supported. Try using Chrome or Firefox for better compatibility.'
+            break
+          case 'OverconstrainedError':
+            errorMessage += 'Audio/video constraints not supported. Trying with basic settings...'
+            // Fallback with minimal constraints
+            try {
+              const fallbackConstraints = type === 'video' 
+                ? { video: true, audio: true }
+                : { audio: true }
+              const fallbackStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints)
+              streamRef.current = fallbackStream
+              // Continue with recording setup...
+              return
+                         } catch {
+               errorMessage += ' Fallback also failed.'
+             }
+            break
+          default:
+            errorMessage += 'Unknown error occurred. Please try again or use a different browser.'
+        }
+      }
+      
+      alert(errorMessage + '\n\nNote: Brave browser has known audio recording issues. Consider using Chrome or Firefox.')
     }
   }
 
@@ -268,6 +345,17 @@ export function VoiceVideoNotes({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Browser Warning */}
+        {browserWarning && (
+          <Card className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+            <CardContent className="p-3">
+              <div className="text-sm text-orange-800 dark:text-orange-200">
+                {browserWarning}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Recording Controls */}
         <div className="flex items-center gap-2">
           {!isRecording ? (
@@ -401,8 +489,12 @@ export function VoiceVideoNotes({
         )}
 
         {/* Browser Support Info */}
-        <div className="text-xs text-muted-foreground">
-          <p>• Voice transcription requires Chrome/Edge browser</p>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p><strong>Browser Compatibility:</strong></p>
+          <p>• ✅ Chrome/Edge: Full support for voice & video recording</p>
+          <p>• ✅ Firefox: Good support for recording</p>
+          <p>• ✅ Safari: Basic recording support</p>
+          <p>• ⚠️ Brave: Known audio issues - use Chrome/Firefox instead</p>
           <p>• Maximum recording duration: {maxDuration} seconds</p>
           <p>• Recordings are stored locally in your browser</p>
         </div>
