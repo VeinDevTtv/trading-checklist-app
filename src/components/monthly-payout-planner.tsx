@@ -45,7 +45,6 @@ interface CustomPropFirm extends PropFirmRule {
 
 interface PayoutPlan {
   targetDate: string
-  targetAmount: number
   currentBalance: number
   propFirm: string
   dailyRiskBudget: number
@@ -53,6 +52,10 @@ interface PayoutPlan {
   tradingDaysRemaining: number
   successProbability: number
   riskLevel: 'low' | 'medium' | 'high' | 'extreme'
+  profitTarget: number // The actual profit target amount based on prop firm rules
+  profitTargetPercentage: number // The percentage target
+  remainingProfitNeeded: number // How much more profit is needed
+  isTargetReached: boolean // Whether the profit target is already reached
 }
 
 interface MonthlyPayoutPlannerProps {
@@ -61,7 +64,6 @@ interface MonthlyPayoutPlannerProps {
 }
 
 export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpdate }: MonthlyPayoutPlannerProps) {
-  const [targetAmount, setTargetAmount] = useState<number>(5000)
   const [targetDate, setTargetDate] = useState<string>(() => {
     const date = new Date()
     date.setMonth(date.getMonth() + 1)
@@ -331,57 +333,91 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
     // Ensure minimum trading days
     tradingDaysRemaining = Math.max(tradingDaysRemaining, rules.minTradingDays)
 
-    // Calculate required daily profit
-    const profitNeeded = targetAmount - currentBalance
-    const requiredDailyProfit = profitNeeded / tradingDaysRemaining
+    // Calculate profit target based on prop firm rules
+    const profitTarget = selectedAccountSize * (rules.profitTarget / 100)
+    const profitTargetPercentage = rules.profitTarget
+    
+    // Calculate how much profit is still needed
+    const currentProfit = currentBalance - selectedAccountSize
+    const remainingProfitNeeded = Math.max(0, profitTarget - currentProfit)
+    const isTargetReached = currentProfit >= profitTarget
+
+    // Calculate required daily profit to reach target
+    const requiredDailyProfit = isTargetReached ? 0 : remainingProfitNeeded / tradingDaysRemaining
 
     // Calculate daily risk budget (conservative approach)
     const maxDailyLossAmount = currentBalance * (rules.maxDailyLoss / 100)
-    const dailyRiskBudget = Math.min(
-      maxDailyLossAmount * 0.5, // Use 50% of max allowed loss as safety margin
-      requiredDailyProfit * 2 // Risk 2x the required profit (1:2 risk-reward)
-    )
+    
+    // Use a more realistic risk budget calculation
+    let dailyRiskBudget: number
+    if (isTargetReached) {
+      // If target is reached, use minimal risk for maintenance
+      dailyRiskBudget = maxDailyLossAmount * 0.25
+    } else {
+      // Calculate based on required daily profit with proper risk-reward ratio
+      const conservativeRiskBudget = maxDailyLossAmount * 0.6 // 60% of max allowed loss
+      const profitBasedRisk = requiredDailyProfit * 1.5 // Risk 1.5x the required profit (1:1.5 RR minimum)
+      dailyRiskBudget = Math.min(conservativeRiskBudget, profitBasedRisk)
+    }
 
     // Calculate success probability based on various factors
     let successProbability = 100
     
-    // Factor 1: Time pressure
-    if (tradingDaysRemaining < rules.minTradingDays) successProbability -= 30
-    else if (tradingDaysRemaining < 15) successProbability -= 15
-    
-    // Factor 2: Daily profit requirement vs account size
-    const dailyProfitPercentage = (requiredDailyProfit / currentBalance) * 100
-    if (dailyProfitPercentage > 3) successProbability -= 25
-    else if (dailyProfitPercentage > 2) successProbability -= 15
-    else if (dailyProfitPercentage > 1) successProbability -= 10
-    
-    // Factor 3: Risk budget vs daily loss limit
-    const riskPercentage = (dailyRiskBudget / currentBalance) * 100
-    if (riskPercentage > rules.maxDailyLoss * 0.8) successProbability -= 20
-    
-    // Factor 4: Consistency requirements
-    if (rules.consistencyRule && dailyProfitPercentage > 1.5) successProbability -= 15
+    if (isTargetReached) {
+      successProbability = 95 // High probability if already at target
+    } else {
+      // Factor 1: Time pressure
+      if (tradingDaysRemaining < rules.minTradingDays) successProbability -= 40
+      else if (tradingDaysRemaining < 10) successProbability -= 25
+      else if (tradingDaysRemaining < 15) successProbability -= 15
+      
+      // Factor 2: Daily profit requirement vs account size
+      const dailyProfitPercentage = (requiredDailyProfit / selectedAccountSize) * 100
+      if (dailyProfitPercentage > 2) successProbability -= 35
+      else if (dailyProfitPercentage > 1.5) successProbability -= 25
+      else if (dailyProfitPercentage > 1) successProbability -= 15
+      else if (dailyProfitPercentage > 0.5) successProbability -= 10
+      
+      // Factor 3: Risk budget vs daily loss limit
+      const riskPercentage = (dailyRiskBudget / currentBalance) * 100
+      if (riskPercentage > rules.maxDailyLoss * 0.8) successProbability -= 25
+      
+      // Factor 4: Consistency requirements
+      if (rules.consistencyRule && dailyProfitPercentage > 1) successProbability -= 15
 
-    successProbability = Math.max(0, Math.min(100, successProbability))
+      // Factor 5: How close to max loss limit
+      const totalLossFromStart = ((selectedAccountSize - currentBalance) / selectedAccountSize) * 100
+      if (totalLossFromStart > rules.maxTotalLoss * 0.7) successProbability -= 20
+    }
+
+    successProbability = Math.max(5, Math.min(100, successProbability))
 
     // Determine risk level
     let riskLevel: PayoutPlan['riskLevel'] = 'low'
-    if (dailyProfitPercentage > 2 || successProbability < 50) riskLevel = 'extreme'
-    else if (dailyProfitPercentage > 1.5 || successProbability < 70) riskLevel = 'high'
-    else if (dailyProfitPercentage > 1 || successProbability < 85) riskLevel = 'medium'
+    if (isTargetReached) {
+      riskLevel = 'low'
+    } else {
+      const dailyProfitPercentage = (requiredDailyProfit / selectedAccountSize) * 100
+      if (dailyProfitPercentage > 1.5 || successProbability < 40) riskLevel = 'extreme'
+      else if (dailyProfitPercentage > 1 || successProbability < 60) riskLevel = 'high'
+      else if (dailyProfitPercentage > 0.5 || successProbability < 80) riskLevel = 'medium'
+    }
 
     return {
       targetDate,
-      targetAmount,
       currentBalance,
       propFirm: rules.name,
       dailyRiskBudget,
       requiredDailyProfit,
       tradingDaysRemaining,
       successProbability,
-      riskLevel
+      riskLevel,
+      profitTarget,
+      profitTargetPercentage,
+      remainingProfitNeeded,
+      isTargetReached
     }
-  }, [targetAmount, targetDate, currentBalance, selectedPropFirm, propFirmRules])
+  }, [targetDate, currentBalance, selectedPropFirm, propFirmRules, selectedAccountSize])
 
   // Update parent component when plan changes
   useEffect(() => {
@@ -673,33 +709,44 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
       </Card>
 
       {/* Target Configuration */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <Label htmlFor="target-amount">Target Payout ($)</Label>
-            <Input
-              id="target-amount"
-              type="number"
-              value={targetAmount}
-              onChange={(e) => setTargetAmount(Number(e.target.value))}
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <Label htmlFor="target-date">Target Date</Label>
-            <Input
-              id="target-date"
-              type="date"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Challenge Progress
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="target-date">Target Completion Date</Label>
+              <Input
+                id="target-date"
+                type="date"
+                value={targetDate}
+                onChange={(e) => setTargetDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Profit Target</Label>
+              <div className="p-3 bg-muted rounded-md">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Required:</span>
+                  <span className="font-semibold">
+                    ${payoutPlan.profitTarget.toFixed(0)} ({payoutPlan.profitTargetPercentage}%)
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-sm text-muted-foreground">Remaining:</span>
+                  <span className={`font-semibold ${payoutPlan.isTargetReached ? 'text-green-600' : 'text-orange-600'}`}>
+                    {payoutPlan.isTargetReached ? 'Target Reached! 🎉' : `$${payoutPlan.remainingProfitNeeded.toFixed(0)}`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Plan Results */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -708,15 +755,17 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Daily Profit Needed</p>
+                <p className="text-sm text-muted-foreground">
+                  {payoutPlan.isTargetReached ? 'Daily Maintenance' : 'Daily Profit Needed'}
+                </p>
                 <p className="text-2xl font-bold flex items-center gap-1">
-                  <DollarSign className="h-5 w-5 text-green-500" />
-                  ${payoutPlan.requiredDailyProfit.toFixed(0)}
+                  <DollarSign className={`h-5 w-5 ${payoutPlan.isTargetReached ? 'text-blue-500' : 'text-green-500'}`} />
+                  {payoutPlan.isTargetReached ? 'Target Met' : `$${payoutPlan.requiredDailyProfit.toFixed(0)}`}
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">
-                  {((payoutPlan.requiredDailyProfit / currentBalance) * 100).toFixed(1)}%
+                  {payoutPlan.isTargetReached ? '0.0%' : `${((payoutPlan.requiredDailyProfit / selectedAccountSize) * 100).toFixed(2)}%`}
                 </p>
               </div>
             </div>
@@ -828,29 +877,31 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
               </div>
 
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Your Plan</h4>
+                <h4 className="font-semibold text-sm">Your Progress</h4>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span>Daily Risk:</span>
+                    <span>Current Profit:</span>
+                    <span className={`font-medium ${(currentBalance - selectedAccountSize) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      ${(currentBalance - selectedAccountSize).toFixed(0)} ({(((currentBalance - selectedAccountSize) / selectedAccountSize) * 100).toFixed(2)}%)
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Daily Risk Budget:</span>
                     <span className="font-medium">
-                      {((payoutPlan.dailyRiskBudget / currentBalance) * 100).toFixed(1)}%
+                      ${payoutPlan.dailyRiskBudget.toFixed(0)} ({((payoutPlan.dailyRiskBudget / currentBalance) * 100).toFixed(1)}%)
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Daily Profit Target:</span>
                     <span className="font-medium">
-                      {((payoutPlan.requiredDailyProfit / currentBalance) * 100).toFixed(1)}%
+                      {payoutPlan.isTargetReached ? 'Maintenance Mode' : `$${payoutPlan.requiredDailyProfit.toFixed(0)} (${((payoutPlan.requiredDailyProfit / selectedAccountSize) * 100).toFixed(2)}%)`}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Risk:Reward Ratio:</span>
                     <span className="font-medium">
-                      1:{(payoutPlan.requiredDailyProfit / payoutPlan.dailyRiskBudget).toFixed(1)}
+                      {payoutPlan.isTargetReached ? 'Conservative' : `1:${(payoutPlan.requiredDailyProfit / payoutPlan.dailyRiskBudget).toFixed(1)}`}
                     </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Account Size:</span>
-                    <span className="font-medium">${selectedAccountSize.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -874,24 +925,36 @@ export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpd
                 Recommendations
               </h4>
               <div className="space-y-1 text-sm text-muted-foreground">
-                {payoutPlan.riskLevel === 'extreme' && (
-                  <p className="text-red-600">⚠️ This plan is extremely risky. Consider extending your timeline or reducing your target.</p>
+                {payoutPlan.isTargetReached ? (
+                  <>
+                    <p className="text-green-600">🎉 Congratulations! You&apos;ve reached your profit target!</p>
+                    <p>• Focus on maintaining your gains and avoiding unnecessary risks</p>
+                    <p>• Consider reducing position sizes to preserve your progress</p>
+                    <p>• Complete the minimum trading days requirement: {propFirmRules[selectedPropFirm].minTradingDays} days</p>
+                  </>
+                ) : (
+                  <>
+                    {payoutPlan.riskLevel === 'extreme' && (
+                      <p className="text-red-600">⚠️ Extremely challenging target. Consider extending your timeline.</p>
+                    )}
+                    {payoutPlan.riskLevel === 'high' && (
+                      <p className="text-orange-600">⚠️ Aggressive target. Focus on high-probability setups only.</p>
+                    )}
+                    {payoutPlan.successProbability < 70 && (
+                      <p>• Consider extending your target date to improve success probability</p>
+                    )}
+                    {((payoutPlan.requiredDailyProfit / selectedAccountSize) * 100) > 1 && (
+                      <p>• Daily profit target is ambitious. Focus on quality over quantity.</p>
+                    )}
+                    {payoutPlan.tradingDaysRemaining < 15 && (
+                      <p>• Limited time remaining. Avoid overtrading and stick to your best setups.</p>
+                    )}
+                    <p>• Maintain strict risk management: never exceed ${payoutPlan.dailyRiskBudget.toFixed(0)} daily risk</p>
+                    <p>• You need ${payoutPlan.remainingProfitNeeded.toFixed(0)} more profit to reach the {payoutPlan.profitTargetPercentage}% target</p>
+                  </>
                 )}
-                {payoutPlan.riskLevel === 'high' && (
-                  <p className="text-orange-600">⚠️ High risk plan. Focus on high-probability setups only.</p>
-                )}
-                {payoutPlan.successProbability < 70 && (
-                  <p>• Consider extending your target date to improve success probability</p>
-                )}
-                {((payoutPlan.requiredDailyProfit / currentBalance) * 100) > 2 && (
-                  <p>• Daily profit target is aggressive. Focus on quality over quantity.</p>
-                )}
-                {payoutPlan.tradingDaysRemaining < 15 && (
-                  <p>• Limited time remaining. Avoid overtrading and stick to your best setups.</p>
-                )}
-                <p>• Maintain strict risk management: never exceed ${payoutPlan.dailyRiskBudget.toFixed(0)} daily risk</p>
                 <p>• Track your progress daily and adjust if needed</p>
-                <p>• Consider the consistency rule: {propFirmRules[selectedPropFirm].consistencyRule || 'No specific consistency requirements'}</p>
+                <p>• Respect the consistency rule: {propFirmRules[selectedPropFirm].consistencyRule || 'No specific consistency requirements'}</p>
               </div>
             </div>
           </div>
