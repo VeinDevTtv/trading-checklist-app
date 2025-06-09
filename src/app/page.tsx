@@ -25,6 +25,9 @@ import { CalendarHeatmap } from "@/components/calendar-heatmap";
 import { VoiceVideoNotes } from "@/components/voice-video-notes";
 import { TagHeatmap } from "@/components/tag-heatmap";
 import { CollaborationRoom } from "@/components/collaboration-room";
+import { GamifiedConsistencyMeter } from "@/components/gamified-consistency-meter";
+import { MonthlyPayoutPlanner } from "@/components/monthly-payout-planner";
+import { BulkPDFReportMerge } from "@/components/bulk-pdf-report-merge";
 import { StrategyVersionManager } from "@/lib/strategy-versioning";
 import { ImageStorageManager, TradeImage } from "@/lib/image-storage";
 import { 
@@ -612,7 +615,7 @@ export default function TradingChecklistApp() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="checklist" className="space-y-6">
-          <TabsList className="w-full sm:grid sm:grid-cols-5 flex gap-2 px-2 py-1 rounded-xl bg-muted/50 overflow-x-auto scrollbar-hide">
+          <TabsList className="w-full sm:grid sm:grid-cols-8 flex gap-2 px-2 py-1 rounded-xl bg-muted/50 overflow-x-auto scrollbar-hide">
             <TabsTrigger value="checklist" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
               <CheckCircle className="h-4 w-4" />
               Checklist
@@ -624,6 +627,18 @@ export default function TradingChecklistApp() {
             <TabsTrigger value="performance" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap" data-tour="performance-tab">
               <TrendingUp className="h-4 w-4" />
               Performance
+            </TabsTrigger>
+            <TabsTrigger value="consistency" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+              <Star className="h-4 w-4" />
+              Consistency
+            </TabsTrigger>
+            <TabsTrigger value="planner" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+              <Calendar className="h-4 w-4" />
+              Payout Planner
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+              <Download className="h-4 w-4" />
+              PDF Reports
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap" data-tour="history-tab">
               <History className="h-4 w-4" />
@@ -978,6 +993,23 @@ export default function TradingChecklistApp() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Gamified Consistency Meter Tab */}
+          <TabsContent value="consistency">
+            <GamifiedConsistencyMeter trades={history} />
+          </TabsContent>
+
+          {/* Monthly Payout Planner Tab */}
+          <TabsContent value="planner">
+            <MonthlyPayoutPlanner 
+              currentBalance={10000} // This should come from user settings or be configurable
+            />
+          </TabsContent>
+
+          {/* Bulk PDF Report Merge Tab */}
+          <TabsContent value="reports">
+            <BulkPDFReportMerge trades={history} />
           </TabsContent>
 
           {/* Settings Tab */}
