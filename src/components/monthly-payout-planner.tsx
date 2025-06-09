@@ -19,7 +19,8 @@ import {
   Clock,
   Calculator,
   PiggyBank,
-  Zap
+  Zap,
+  Settings
 } from "lucide-react"
 
 interface PropFirmRule {
@@ -30,6 +31,7 @@ interface PropFirmRule {
   minTradingDays: number
   maxTradingDays: number
   consistencyRule?: string
+  accountSizes: number[] // Available account sizes
 }
 
 interface PayoutPlan {
@@ -45,11 +47,11 @@ interface PayoutPlan {
 }
 
 interface MonthlyPayoutPlannerProps {
-  currentBalance: number
+  currentBalance?: number
   onPlanUpdate?: (plan: PayoutPlan) => void
 }
 
-export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPayoutPlannerProps) {
+export function MonthlyPayoutPlanner({ currentBalance: initialBalance, onPlanUpdate }: MonthlyPayoutPlannerProps) {
   const [targetAmount, setTargetAmount] = useState<number>(5000)
   const [targetDate, setTargetDate] = useState<string>(() => {
     const date = new Date()
@@ -57,8 +59,10 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
     return date.toISOString().split('T')[0]
   })
   const [selectedPropFirm, setSelectedPropFirm] = useState<string>('ftmo')
+  const [currentBalance, setCurrentBalance] = useState<number>(initialBalance || 10000)
+  const [selectedAccountSize, setSelectedAccountSize] = useState<number>(10000)
 
-  // Prop firm rules database
+  // Prop firm rules database with more firms
   const propFirmRules: Record<string, PropFirmRule> = useMemo(() => ({
     ftmo: {
       name: 'FTMO',
@@ -67,7 +71,8 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
       profitTarget: 10,
       minTradingDays: 10,
       maxTradingDays: 30,
-      consistencyRule: 'No single day > 50% of total profit'
+      consistencyRule: 'No single day > 50% of total profit',
+      accountSizes: [10000, 25000, 50000, 100000, 200000]
     },
     fundednext: {
       name: 'FundedNext',
@@ -76,7 +81,8 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
       profitTarget: 8,
       minTradingDays: 5,
       maxTradingDays: 30,
-      consistencyRule: 'No single day > 40% of total profit'
+      consistencyRule: 'No single day > 40% of total profit',
+      accountSizes: [6000, 15000, 25000, 50000, 100000, 200000]
     },
     myforexfunds: {
       name: 'MyForexFunds',
@@ -84,7 +90,8 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
       maxTotalLoss: 12,
       profitTarget: 8,
       minTradingDays: 5,
-      maxTradingDays: 30
+      maxTradingDays: 30,
+      accountSizes: [5000, 10000, 25000, 50000, 100000, 200000]
     },
     thefundedtrader: {
       name: 'The Funded Trader',
@@ -92,7 +99,8 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
       maxTotalLoss: 8,
       profitTarget: 8,
       minTradingDays: 5,
-      maxTradingDays: 30
+      maxTradingDays: 30,
+      accountSizes: [5000, 15000, 25000, 50000, 100000, 200000, 400000]
     },
     apex: {
       name: 'Apex Trader Funding',
@@ -100,9 +108,69 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
       maxTotalLoss: 6,
       profitTarget: 8,
       minTradingDays: 10,
-      maxTradingDays: 30
+      maxTradingDays: 30,
+      accountSizes: [25000, 50000, 75000, 100000, 150000, 250000]
+    },
+    fundingpips: {
+      name: 'FundingPips',
+      maxDailyLoss: 5,
+      maxTotalLoss: 10,
+      profitTarget: 8,
+      minTradingDays: 5,
+      maxTradingDays: 30,
+      consistencyRule: 'No single day > 50% of total profit',
+      accountSizes: [10000, 25000, 50000, 100000, 200000]
+    },
+    goatfundedtrader: {
+      name: 'Goat Funded Trader',
+      maxDailyLoss: 5,
+      maxTotalLoss: 10,
+      profitTarget: 8,
+      minTradingDays: 4,
+      maxTradingDays: 30,
+      consistencyRule: 'No single day > 30% of total profit',
+      accountSizes: [5000, 10000, 25000, 50000, 100000, 200000]
+    },
+    topstep: {
+      name: 'TopStep',
+      maxDailyLoss: 3,
+      maxTotalLoss: 6,
+      profitTarget: 6,
+      minTradingDays: 8,
+      maxTradingDays: 30,
+      consistencyRule: 'No single day > 50% of total profit',
+      accountSizes: [25000, 50000, 100000, 150000]
+    },
+    lux: {
+      name: 'Lux Trading Firm',
+      maxDailyLoss: 5,
+      maxTotalLoss: 10,
+      profitTarget: 8,
+      minTradingDays: 3,
+      maxTradingDays: 30,
+      accountSizes: [10000, 25000, 50000, 100000, 200000]
+    },
+    e8: {
+      name: 'E8 Markets',
+      maxDailyLoss: 5,
+      maxTotalLoss: 8,
+      profitTarget: 8,
+      minTradingDays: 5,
+      maxTradingDays: 30,
+      consistencyRule: 'No single day > 25% of total profit',
+      accountSizes: [25000, 50000, 100000, 200000]
     }
   }), [])
+
+  // Update account size when prop firm changes
+  useEffect(() => {
+    const rules = propFirmRules[selectedPropFirm]
+    if (rules && !rules.accountSizes.includes(selectedAccountSize)) {
+      const newSize = rules.accountSizes[0]
+      setSelectedAccountSize(newSize)
+      setCurrentBalance(newSize)
+    }
+  }, [selectedPropFirm, selectedAccountSize, propFirmRules])
 
   // Calculate payout plan
   const payoutPlan = useMemo((): PayoutPlan => {
@@ -216,8 +284,72 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
         </CardContent>
       </Card>
 
-      {/* Input Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Account Configuration */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Account Configuration
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="prop-firm">Prop Firm</Label>
+              <Select value={selectedPropFirm} onValueChange={setSelectedPropFirm}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(propFirmRules).map(([key, rule]) => (
+                    <SelectItem key={key} value={key}>
+                      {rule.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="account-size">Account Size</Label>
+              <Select 
+                value={selectedAccountSize.toString()} 
+                onValueChange={(value) => {
+                  const size = Number(value)
+                  setSelectedAccountSize(size)
+                  setCurrentBalance(size)
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {propFirmRules[selectedPropFirm].accountSizes.map((size) => (
+                    <SelectItem key={size} value={size.toString()}>
+                      ${size.toLocaleString()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="current-balance">Current Balance</Label>
+              <Input
+                id="current-balance"
+                type="number"
+                value={currentBalance}
+                onChange={(e) => setCurrentBalance(Number(e.target.value))}
+                min={0}
+                max={selectedAccountSize}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Target Configuration */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardContent className="p-4">
             <Label htmlFor="target-amount">Target Payout ($)</Label>
@@ -241,37 +373,6 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
               onChange={(e) => setTargetDate(e.target.value)}
               className="mt-2"
             />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <Label htmlFor="current-balance">Current Balance ($)</Label>
-            <Input
-              id="current-balance"
-              type="number"
-              value={currentBalance}
-              disabled
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <Label htmlFor="prop-firm">Prop Firm</Label>
-            <Select value={selectedPropFirm} onValueChange={setSelectedPropFirm}>
-              <SelectTrigger className="mt-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(propFirmRules).map(([key, rule]) => (
-                  <SelectItem key={key} value={key}>
-                    {rule.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </CardContent>
         </Card>
       </div>
@@ -374,14 +475,14 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
                 {payoutPlan.riskLevel.toUpperCase()} RISK
               </Badge>
               <span className="text-sm text-muted-foreground">
-                Based on prop firm rules and market conditions
+                Based on {propFirmRules[selectedPropFirm].name} rules and market conditions
               </span>
             </div>
 
             {/* Prop Firm Rules */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Prop Firm Limits</h4>
+                <h4 className="font-semibold text-sm">{propFirmRules[selectedPropFirm].name} Limits</h4>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>Max Daily Loss:</span>
@@ -394,6 +495,10 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
                   <div className="flex justify-between">
                     <span>Profit Target:</span>
                     <span className="font-medium">{propFirmRules[selectedPropFirm].profitTarget}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Min Trading Days:</span>
+                    <span className="font-medium">{propFirmRules[selectedPropFirm].minTradingDays}</span>
                   </div>
                 </div>
               </div>
@@ -419,9 +524,23 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
                       1:{(payoutPlan.requiredDailyProfit / payoutPlan.dailyRiskBudget).toFixed(1)}
                     </span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Account Size:</span>
+                    <span className="font-medium">${selectedAccountSize.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Consistency Rule */}
+            {propFirmRules[selectedPropFirm].consistencyRule && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-100">Consistency Rule</h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {propFirmRules[selectedPropFirm].consistencyRule}
+                </p>
+              </div>
+            )}
 
             {/* Recommendations */}
             <Separator />
@@ -448,6 +567,7 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
                 )}
                 <p>• Maintain strict risk management: never exceed ${payoutPlan.dailyRiskBudget.toFixed(0)} daily risk</p>
                 <p>• Track your progress daily and adjust if needed</p>
+                <p>• Consider the consistency rule: {propFirmRules[selectedPropFirm].consistencyRule || 'No specific consistency requirements'}</p>
               </div>
             </div>
           </div>

@@ -1002,9 +1002,7 @@ export default function TradingChecklistApp() {
 
           {/* Monthly Payout Planner Tab */}
           <TabsContent value="planner">
-            <MonthlyPayoutPlanner 
-              currentBalance={10000} // This should come from user settings or be configurable
-            />
+            <MonthlyPayoutPlanner />
           </TabsContent>
 
           {/* Bulk PDF Report Merge Tab */}
