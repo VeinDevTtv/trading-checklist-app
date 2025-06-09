@@ -88,7 +88,7 @@ export function BulkPDFReportMerge({ trades }: BulkPDFReportMergeProps) {
   const [generationProgress, setGenerationProgress] = useState(0)
 
   // Available report sections
-  const reportSections: ReportSection[] = [
+  const reportSections: ReportSection[] = useMemo(() => [
     {
       id: 'executive-summary',
       name: 'Executive Summary',
@@ -173,10 +173,10 @@ export function BulkPDFReportMerge({ trades }: BulkPDFReportMergeProps) {
       enabled: false,
       required: false
     }
-  ]
+  ], [])
 
   // Report templates
-  const reportTemplates: ReportTemplate[] = [
+  const reportTemplates: ReportTemplate[] = useMemo(() => [
     {
       id: 'prop-firm',
       name: 'Prop Firm Report',
@@ -237,7 +237,7 @@ export function BulkPDFReportMerge({ trades }: BulkPDFReportMergeProps) {
       sections: [],
       format: 'detailed'
     }
-  ]
+  ], [])
 
   // Filter trades by selected month
   const monthlyTrades = useMemo(() => {
@@ -344,7 +344,7 @@ export function BulkPDFReportMerge({ trades }: BulkPDFReportMergeProps) {
     return reportSections.filter(section => 
       section.required || template.sections.includes(section.id)
     )
-  }, [selectedTemplate, customSections])
+  }, [selectedTemplate, customSections, reportSections, reportTemplates])
 
   // Handle template change
   const handleTemplateChange = (templateId: string) => {

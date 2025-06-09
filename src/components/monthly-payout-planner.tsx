@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -59,7 +59,7 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
   const [selectedPropFirm, setSelectedPropFirm] = useState<string>('ftmo')
 
   // Prop firm rules database
-  const propFirmRules: Record<string, PropFirmRule> = {
+  const propFirmRules: Record<string, PropFirmRule> = useMemo(() => ({
     ftmo: {
       name: 'FTMO',
       maxDailyLoss: 5,
@@ -102,15 +102,13 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
       minTradingDays: 10,
       maxTradingDays: 30
     }
-  }
+  }), [])
 
   // Calculate payout plan
   const payoutPlan = useMemo((): PayoutPlan => {
     const rules = propFirmRules[selectedPropFirm]
     const today = new Date()
     const target = new Date(targetDate)
-    const timeDiff = target.getTime() - today.getTime()
-    const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24))
     
     // Calculate trading days (excluding weekends)
     let tradingDaysRemaining = 0
@@ -176,7 +174,7 @@ export function MonthlyPayoutPlanner({ currentBalance, onPlanUpdate }: MonthlyPa
       successProbability,
       riskLevel
     }
-  }, [targetAmount, targetDate, currentBalance, selectedPropFirm])
+  }, [targetAmount, targetDate, currentBalance, selectedPropFirm, propFirmRules])
 
   // Update parent component when plan changes
   useEffect(() => {
