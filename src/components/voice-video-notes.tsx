@@ -77,6 +77,19 @@ export function VoiceVideoNotes({
     }
 
     checkBrowserCompatibility()
+
+    // Cleanup function
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
+      }
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+      }
+    }
   }, [])
 
   const startRecording = async (type: 'voice' | 'video') => {
@@ -115,62 +128,87 @@ export function VoiceVideoNotes({
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
       streamRef.current = stream
 
-      const mediaRecorder = new MediaRecorder(stream)
-      mediaRecorderRef.current = mediaRecorder
-      chunksRef.current = []
-
-      mediaRecorder.ondataavailable = (event: BlobEvent) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data)
-        }
-      }
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { 
-          type: type === 'video' ? 'video/webm' : 'audio/webm' 
+      // Setup MediaRecorder
+      const setupRecorder = (mediaStream: MediaStream) => {
+        const mediaRecorder = new MediaRecorder(mediaStream, {
+          mimeType: type === 'video' ? 'video/webm;codecs=vp8,opus' : 'audio/webm;codecs=opus'
         })
-        const url = URL.createObjectURL(blob)
-        
-        const newNote: VoiceVideoNote = {
-          id: Date.now().toString(),
-          type,
-          blob,
-          url,
-          duration: currentTime,
-          timestamp: new Date().toLocaleString(),
-          transcription: '',
-          isTranscribing: false
-        }
+        mediaRecorderRef.current = mediaRecorder
+        chunksRef.current = []
 
-        onNotesChange([...notes, newNote])
-        
-        // Start transcription for voice notes
-        if (type === 'voice') {
-          transcribeAudio(newNote.id, blob)
-        }
-
-        // Cleanup
-        stream.getTracks().forEach(track => track.stop())
-        streamRef.current = null
-        setCurrentTime(0)
-      }
-
-      mediaRecorder.start()
-      setIsRecording(true)
-      setRecordingType(type)
-      setCurrentTime(0)
-
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setCurrentTime(prev => {
-          const newTime = prev + 1
-          if (newTime >= maxDuration) {
-            stopRecording()
-            return maxDuration
+        mediaRecorder.ondataavailable = (event: BlobEvent) => {
+          if (event.data.size > 0) {
+            chunksRef.current.push(event.data)
           }
-          return newTime
-        })
-      }, 1000)
+        }
+
+        mediaRecorder.onstop = () => {
+          console.log('Recording stopped, chunks:', chunksRef.current.length)
+          
+          if (chunksRef.current.length === 0) {
+            console.warn('No audio/video data recorded')
+            alert('No audio/video data was recorded. Please try again and make sure you speak into the microphone.')
+            return
+          }
+
+          const blob = new Blob(chunksRef.current, { 
+            type: type === 'video' ? 'video/webm' : 'audio/webm' 
+          })
+          
+          console.log('Created blob:', blob.size, 'bytes')
+          
+          if (blob.size === 0) {
+            console.warn('Empty blob created')
+            alert('Recording failed - no data captured. Please check your microphone/camera permissions.')
+            return
+          }
+
+          const url = URL.createObjectURL(blob)
+          
+          const newNote: VoiceVideoNote = {
+            id: Date.now().toString(),
+            type,
+            blob,
+            url,
+            duration: currentTime,
+            timestamp: new Date().toLocaleString(),
+            transcription: '',
+            isTranscribing: false
+          }
+
+          console.log('Adding new note:', newNote.id, 'Duration:', newNote.duration)
+          onNotesChange([...notes, newNote])
+          
+          // Start transcription for voice notes
+          if (type === 'voice') {
+            transcribeAudio(newNote.id)
+          }
+
+          // Cleanup
+          mediaStream.getTracks().forEach(track => track.stop())
+          streamRef.current = null
+          setCurrentTime(0)
+        }
+
+        mediaRecorder.start()
+        setIsRecording(true)
+        setRecordingType(type)
+        setCurrentTime(0)
+
+        // Start timer
+        timerRef.current = setInterval(() => {
+          setCurrentTime(prev => {
+            const newTime = prev + 1
+            if (newTime >= maxDuration) {
+              stopRecording()
+              return maxDuration
+            }
+            return newTime
+          })
+        }, 1000)
+      }
+
+      setupRecorder(stream)
 
     } catch (error) {
       console.error('Error starting recording:', error)
@@ -198,11 +236,88 @@ export function VoiceVideoNotes({
                 : { audio: true }
               const fallbackStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints)
               streamRef.current = fallbackStream
-              // Continue with recording setup...
-              return
-                         } catch {
-               errorMessage += ' Fallback also failed.'
-             }
+              
+              // Setup recorder with fallback stream
+              const setupFallbackRecorder = (mediaStream: MediaStream) => {
+                const mediaRecorder = new MediaRecorder(mediaStream)
+                mediaRecorderRef.current = mediaRecorder
+                chunksRef.current = []
+
+                mediaRecorder.ondataavailable = (event: BlobEvent) => {
+                  if (event.data.size > 0) {
+                    chunksRef.current.push(event.data)
+                  }
+                }
+
+                mediaRecorder.onstop = () => {
+                  console.log('Fallback recording stopped, chunks:', chunksRef.current.length)
+                  
+                  if (chunksRef.current.length === 0) {
+                    console.warn('No audio/video data recorded in fallback')
+                    alert('No audio/video data was recorded. Please try again and make sure you speak into the microphone.')
+                    return
+                  }
+
+                  const blob = new Blob(chunksRef.current, { 
+                    type: type === 'video' ? 'video/webm' : 'audio/webm' 
+                  })
+                  
+                  console.log('Created fallback blob:', blob.size, 'bytes')
+                  
+                  if (blob.size === 0) {
+                    console.warn('Empty fallback blob created')
+                    alert('Recording failed - no data captured. Please check your microphone/camera permissions.')
+                    return
+                  }
+
+                  const url = URL.createObjectURL(blob)
+                  
+                  const newNote: VoiceVideoNote = {
+                    id: Date.now().toString(),
+                    type,
+                    blob,
+                    url,
+                    duration: currentTime,
+                    timestamp: new Date().toLocaleString(),
+                    transcription: '',
+                    isTranscribing: false
+                  }
+
+                  console.log('Adding fallback note:', newNote.id, 'Duration:', newNote.duration)
+                  onNotesChange([...notes, newNote])
+                  
+                  if (type === 'voice') {
+                    transcribeAudio(newNote.id)
+                  }
+
+                  mediaStream.getTracks().forEach(track => track.stop())
+                  streamRef.current = null
+                  setCurrentTime(0)
+                }
+
+                mediaRecorder.start()
+                setIsRecording(true)
+                setRecordingType(type)
+                setCurrentTime(0)
+
+                timerRef.current = setInterval(() => {
+                  setCurrentTime(prev => {
+                    const newTime = prev + 1
+                    if (newTime >= maxDuration) {
+                      stopRecording()
+                      return maxDuration
+                    }
+                    return newTime
+                  })
+                }, 1000)
+              }
+
+              setupFallbackRecorder(fallbackStream)
+              return // Exit successfully with fallback
+            } catch (fallbackError) {
+              console.error('Fallback recording failed:', fallbackError)
+              errorMessage += ' Fallback also failed.'
+            }
             break
           default:
             errorMessage += 'Unknown error occurred. Please try again or use a different browser.'
@@ -225,7 +340,7 @@ export function VoiceVideoNotes({
     }
   }
 
-  const transcribeAudio = async (noteId: string, audioBlob: Blob) => {
+  const transcribeAudio = async (noteId: string) => {
     setIsTranscribing(noteId)
     
     // Update the note to show transcribing status
@@ -235,10 +350,6 @@ export function VoiceVideoNotes({
     onNotesChange(updatedNotes)
 
     try {
-      // Convert blob to audio for speech recognition
-      const audioUrl = URL.createObjectURL(audioBlob)
-      const audio = new Audio(audioUrl)
-      
       if (recognitionRef.current) {
         recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
           let transcript = ''
@@ -256,26 +367,30 @@ export function VoiceVideoNotes({
           setIsTranscribing(null)
         }
 
-        recognitionRef.current.onerror = () => {
+        recognitionRef.current.onerror = (event) => {
+          console.error('Speech recognition error:', event)
           const errorNotes = notes.map(note => 
             note.id === noteId 
-              ? { ...note, transcription: 'Transcription failed', isTranscribing: false }
+              ? { ...note, transcription: 'Transcription failed - try speaking more clearly', isTranscribing: false }
               : note
           )
           onNotesChange(errorNotes)
           setIsTranscribing(null)
         }
 
-        // Play audio and start recognition
-        audio.play()
+        recognitionRef.current.onend = () => {
+          setIsTranscribing(null)
+        }
+
+        // Start recognition directly with the audio blob
         recognitionRef.current.start()
         
-        // Stop recognition when audio ends
-        audio.onended = () => {
-          if (recognitionRef.current) {
+        // Stop recognition after a reasonable time
+        setTimeout(() => {
+          if (recognitionRef.current && isTranscribing === noteId) {
             recognitionRef.current.stop()
           }
-        }
+        }, 5000) // 5 second timeout
       } else {
         // Fallback if Speech Recognition is not available
         const fallbackNotes = notes.map(note => 
@@ -533,6 +648,7 @@ interface SpeechRecognition extends EventTarget {
   stop(): void
   onresult: ((event: SpeechRecognitionEvent) => void) | null
   onerror: ((event: Event) => void) | null
+  onend: ((event: Event) => void) | null
 }
 
 declare global {
