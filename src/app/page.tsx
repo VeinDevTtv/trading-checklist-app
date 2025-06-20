@@ -605,6 +605,15 @@ export default function TradingChecklistApp() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.location.href = '/mentorship'}
+                className="flex items-center gap-2"
+              >
+                <Star className="h-4 w-4" />
+                Mentorship
+              </Button>
               <TourControls />
               <ModeToggle />
             </div>
