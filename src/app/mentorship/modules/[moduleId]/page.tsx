@@ -11,7 +11,7 @@ export default function ModulePage() {
   const router = useRouter();
   const moduleId = params.moduleId as string;
   
-  const { user, isLoading, hasAccess } = useMentorshipAccess({ 
+  const { isLoading, hasAccess } = useMentorshipAccess({ 
     requiredRole: 'mentee',
     moduleId 
   });
@@ -42,7 +42,7 @@ export default function ModulePage() {
                 This module is coming soon. Learn to master your emotions and build trading discipline.
               </p>
               <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg max-w-2xl mx-auto">
-                <h3 className="font-semibold mb-2">What you'll learn:</h3>
+                <h3 className="font-semibold mb-2">What you&apos;ll learn:</h3>
                 <ul className="text-left space-y-2 text-sm">
                   <li>• Emotional control techniques</li>
                   <li>• Building trading discipline</li>
@@ -84,7 +84,7 @@ export default function ModulePage() {
                 Get daily trade setups with detailed analysis and screenshots.
               </p>
               <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg max-w-2xl mx-auto">
-                <h3 className="font-semibold mb-2">What's included:</h3>
+                <h3 className="font-semibold mb-2">What&apos;s included:</h3>
                 <ul className="text-left space-y-2 text-sm">
                   <li>• Daily trade setups with entry/exit points</li>
                   <li>• Detailed chart analysis and reasoning</li>

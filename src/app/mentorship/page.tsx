@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -252,7 +252,7 @@ export default function MentorshipDashboard() {
                 className="h-3"
               />
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                You've completed {userProgress.completedModules} out of {userProgress.totalModules} modules. 
+                You&apos;ve completed {userProgress.completedModules} out of {userProgress.totalModules} modules. 
                 Keep up the great work!
               </p>
             </div>
@@ -274,7 +274,7 @@ export default function MentorshipDashboard() {
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push('/mentorship/modules/signals')}>
             <CardContent className="p-6 text-center">
               <Target className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Today's Signals</h3>
+              <h3 className="font-semibold mb-2">Today&apos;s Signals</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 3 new trade setups available
               </p>

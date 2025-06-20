@@ -10,10 +10,8 @@ import {
   TrendingUp, 
   Target, 
   Brain, 
-  MessageSquare,
   Video,
   FileText,
-  Users,
   Star,
   Shield
 } from 'lucide-react';
